@@ -9,9 +9,9 @@ import java.time.Instant;
 @Getter
 @Setter
 @Builder
-public class StatsRequestDto {
+public class StatsDto {
     private String app;
     private String uri;
     private String ip;
-    private Instant timestamp;
+    private String timestamp;
 }

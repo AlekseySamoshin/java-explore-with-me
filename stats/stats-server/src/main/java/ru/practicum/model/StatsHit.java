@@ -16,7 +16,6 @@ import java.util.Objects;
 @Table(name = "hits")
 public class StatsHit {
     @Id
-//     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,7 +29,7 @@ public class StatsHit {
     private String ip;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(nullable = false)
+    @Column(name = "datetime", nullable = false)
     private LocalDateTime timestamp;
 
     @Override
@@ -39,18 +38,18 @@ public class StatsHit {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        StatsHit thisEndpoint = (StatsHit) o;
-        return id.equals(thisEndpoint.id)
-                && app.equals(thisEndpoint.app)
-                && uri.equals(thisEndpoint.uri)
-                && ip.equals(thisEndpoint.ip)
-                && timestamp.equals(thisEndpoint.timestamp);
+        StatsHit thisHit = (StatsHit) other;
+        return id.equals(thisHit.id)
+                && app.equals(thisHit.app)
+                && uri.equals(thisHit.uri)
+                && ip.equals(thisHit.ip)
+                && timestamp.equals(thisHit.timestamp);
     }
 }

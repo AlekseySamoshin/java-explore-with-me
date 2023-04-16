@@ -7,25 +7,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.HitRequestDto;
-import ru.practicum.StatsRequestDto;
+import ru.practicum.StatsDto;
 import ru.practicum.StatsServer;
 
 @RestController
 public class StatsController {
     private final StatsServer statsServer;
-    private final StatsRequestDto statsRequestDto;
+    private final StatsDto statsDto;
     private final HitRequestDto hitRequestDto;
 
     @Autowired
-    public StatsController (StatsServer statsServer, StatsRequestDto statsRequestDto, HitRequestDto hitRequestDto) {
+    public StatsController (StatsServer statsServer, StatsDto statsDto, HitRequestDto hitRequestDto) {
         this.statsServer = statsServer;
-        this.statsRequestDto = statsRequestDto;
+        this.statsDto = statsDto;
         this.hitRequestDto = hitRequestDto;
     }
 
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    StatsRequestDto viewStats() {
+    StatsDto viewStats() {
         return null;
     }
 

@@ -14,5 +14,4 @@ public class HitRequestDto {
     private String end;
     private List<String> uris;
     private Boolean unique;
-
 }
