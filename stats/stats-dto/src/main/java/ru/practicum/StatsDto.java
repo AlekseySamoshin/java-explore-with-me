@@ -12,6 +12,5 @@ import java.time.Instant;
 public class StatsDto {
     private String app;
     private String uri;
-    private String ip;
-    private String timestamp;
+    private Long hits;
 }
