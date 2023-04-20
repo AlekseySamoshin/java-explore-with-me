@@ -14,7 +14,7 @@ import java.util.Objects;
 //@NoArgsConstructor
 @Entity
 @Table(name = "hits")
-public class StatsHit {
+public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,7 +45,7 @@ public class StatsHit {
         if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        StatsHit thisHit = (StatsHit) other;
+        EndpointHit thisHit = (EndpointHit) other;
         return id.equals(thisHit.id)
                 && app.equals(thisHit.app)
                 && uri.equals(thisHit.uri)
