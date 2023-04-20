@@ -1,11 +1,51 @@
 package ru.practicum;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-@SpringBootApplication
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+@Service
 public class StatsClient {
-    public static void main(String[] args) {
-        SpringApplication.run(StatsClient.class, args);
+    private final String url = "http://stats-server:9090";
+    private final RestTemplate restTemplate;
+
+    private final WebClient webClient = WebClient.create(url);
+
+    @Autowired
+    public StatsClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
+        return webClient.post()
+                .uri("/hit")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(endpointHitDto), EndpointHitDto.class)
+                .retrieve()
+                .bodyToMono(EndpointHitDto.class)
+                .block();
+    }
+
+    public List<ViewStatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
+        return List.of(webClient.get()
+                .uri(uriWithParams -> uriWithParams.path("/stats")
+                        .queryParam("start", start)
+                        .queryParam("end", end)
+                        .queryParam("uris", uris)
+                        .queryParam("unique", unique)
+                        .build())
+                .retrieve()
+                .bodyToMono(ViewStatsDto[].class)
+                .block());
     }
 }

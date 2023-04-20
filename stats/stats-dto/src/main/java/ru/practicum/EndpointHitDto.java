@@ -4,13 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
-public class StatsDto {
+public class EndpointHitDto {
+    private Long id;
     private String app;
     private String uri;
-    private Long hits;
+    private String ip;
+    private LocalDateTime timestamp;
 }
