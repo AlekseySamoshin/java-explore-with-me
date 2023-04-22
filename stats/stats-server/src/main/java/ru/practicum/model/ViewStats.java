@@ -19,7 +19,7 @@ public class ViewStats {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ViewStats viewStats = (ViewStats) o;
-        return hits == viewStats.hits && app.equals(viewStats.app) && uri.equals(viewStats.uri);
+        return hits.equals(viewStats.hits) && app.equals(viewStats.app) && uri.equals(viewStats.uri);
     }
 
     @Override
