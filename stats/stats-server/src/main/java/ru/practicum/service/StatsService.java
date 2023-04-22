@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.exception.WrongDataException;
-import ru.practicum.model.EndpointHit;
-import ru.practicum.model.ViewStats;
+import ru.practicum.model.DtoMapper;
 import ru.practicum.repository.StatsRepository;
 
 import java.time.LocalDateTime;
@@ -22,19 +21,6 @@ public class StatsService {
         this.statsRepository = statsRepository;
     }
 
-//    public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
-//        return null;
-//    }
-//
-//    public List<ViewStatsDto> getStats(LocalDateTime start,
-//                                       LocalDateTime end,
-//                                       List<String> uris,
-//                                       Boolean unique) {
-//        return null;
-//    }
-
-
-    //    @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
 
         if (endpointHitDto.getApp() == null || endpointHitDto.getApp().isEmpty()) {
@@ -45,56 +31,29 @@ public class StatsService {
             throw new WrongDataException("Передано пустое поле uri");
         }
 
-        return convertStatsHitToDto(statsRepository.save(convertHitDtoToHit(endpointHitDto)));
-//        statsRepository.save(endpointHitDto);
-//        return endpointHitDto;
+        return DtoMapper.mapEnpointHitDto(statsRepository.save(DtoMapper.mapDtoToEndpointHit(endpointHitDto)));
     }
 
-    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-
-//        LocalDateTime start = LocalDateTime.parse(URLDecoder.decode(startString, StandardCharsets.UTF_8),
-//                DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
-//        LocalDateTime end = LocalDateTime.parse(URLDecoder.decode(endString, StandardCharsets.UTF_8),
-//                DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss")));
-
+    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
 
         if (unique) {
-            return statsRepository.findUniqueStats(start, end, uris).stream()
-                    .map(this::convertViewStatsToDto)
+            if (uris != null) {
+                return statsRepository.findUniqueStats(start, end, uris).stream()
+                        .map(DtoMapper::mapViewStatsToDto)
+                        .collect(Collectors.toList());
+            }
+            return statsRepository.findUniqueStats(start, end).stream()
+                    .map(DtoMapper::mapViewStatsToDto)
                     .collect(Collectors.toList());
         }
 
-        return statsRepository.findStats(start, end, uris).stream()
-                .map(this::convertViewStatsToDto)
+        if (uris != null) {
+            return statsRepository.findStats(start, end, uris).stream()
+                    .map(DtoMapper::mapViewStatsToDto)
+                    .collect(Collectors.toList());
+        }
+        return statsRepository.findStats(start, end).stream()
+                .map(DtoMapper::mapViewStatsToDto)
                 .collect(Collectors.toList());
-    }
-
-
-    private EndpointHitDto convertStatsHitToDto(EndpointHit endpointHit) {
-        return EndpointHitDto.builder()
-                .id(endpointHit.getId())
-                .ip(endpointHit.getIp())
-                .app(endpointHit.getApp())
-                .uri(endpointHit.getUri())
-                .timestamp(endpointHit.getTimestamp())
-                .build();
-    }
-
-    private EndpointHit convertHitDtoToHit(EndpointHitDto endpointHitDto) {
-        return EndpointHit.builder()
-                .id(endpointHitDto.getId())
-                .ip(endpointHitDto.getIp())
-                .app(endpointHitDto.getApp())
-                .uri(endpointHitDto.getUri())
-                .timestamp(endpointHitDto.getTimestamp())
-                .build();
-    }
-
-    private ViewStatsDto convertViewStatsToDto(ViewStats viewStats) {
-        return ViewStatsDto.builder()
-                .app(viewStats.getApp())
-                .hits(viewStats.getHits())
-                .uri(viewStats.getUri())
-                .build();
     }
 }

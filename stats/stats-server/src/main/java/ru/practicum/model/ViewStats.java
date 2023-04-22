@@ -2,26 +2,28 @@ package ru.practicum.model;
 
 import lombok.*;
 
-import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "stat_t")
 public class ViewStats {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
     private String app;
     private String uri;
     private Long hits;
 
-    public ViewStats(String app, String uri, Long hits) {
-        this.app = app;
-        this.uri = uri;
-        this.hits = hits;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ViewStats viewStats = (ViewStats) o;
+        return hits == viewStats.hits && app.equals(viewStats.app) && uri.equals(viewStats.uri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(app, uri, hits);
     }
 }

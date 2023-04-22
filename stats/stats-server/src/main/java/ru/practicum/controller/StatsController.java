@@ -4,16 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.service.StatsService;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
+@Service
 @RestController
 public class StatsController {
     private final StatsService statsService;
@@ -35,8 +36,9 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    EndpointHitDto hitStats(@RequestBody @Valid EndpointHitDto endpointHitDto) {
+    EndpointHitDto addEndpointHit(@RequestBody EndpointHitDto endpointHitDto) {
         log.info("Запрос на сохранение факта обращения к эндпоинту");
+        System.out.println(endpointHitDto.toString());
         return statsService.saveHit(endpointHitDto);
     }
 }

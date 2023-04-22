@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 @Setter
 @Builder
 @AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "hits")
 public class EndpointHit {
@@ -22,6 +23,7 @@ public class EndpointHit {
     @Column(nullable = false)
     private String app;
 
+    @NotNull
     @Column(nullable = false)
     private String uri;
 
