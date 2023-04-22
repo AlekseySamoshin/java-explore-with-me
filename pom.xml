@@ -57,6 +57,12 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>0.8.8</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--            <version>2.7.2</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <properties>
@@ -67,15 +73,37 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <spring.profiles.active>test</spring.profiles.active>
-                        </systemPropertyVariables>
-                    </configuration>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                    <version>2.7.2</version>-->
+<!--                    <configuration>-->
+<!--                        <mainClass>-->
+<!--                            ru.practicum.StatsServer-->
+<!--                        </mainClass>-->
+<!--                        <layout>-->
+<!--                            JAR-->
+<!--                        </layout>-->
+<!--                    </configuration>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <goals>-->
+<!--                                <goal>-->
+<!--                                    repackage-->
+<!--                                </goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
+<!--                <plugin>-->
+<!--                    <groupId>org.apache.maven.plugins</groupId>-->
+<!--                    <artifactId>maven-surefire-plugin</artifactId>-->
+<!--                    <configuration>-->
+<!--                        <systemPropertyVariables>-->
+<!--                            <spring.profiles.active>test</spring.profiles.active>-->
+<!--                        </systemPropertyVariables>-->
+<!--                    </configuration>-->
+<!--                </plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
