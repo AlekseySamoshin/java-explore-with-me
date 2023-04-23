@@ -20,7 +20,7 @@ services:
       - POSTGRES_USER=stats
       - POSTGRES_PASSWORD=password
       
-  stats-server:
+  ewm-server:
     build: ./ewm-service
     container_name: ewm_container
 
