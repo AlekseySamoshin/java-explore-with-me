@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DtoMapper {
+    private DtoMapper() {
+    }
     public static EndpointHitDto mapEnpointHitDto(EndpointHit endpointHit) {
         return EndpointHitDto.builder()
                 .ip(endpointHit.getIp())

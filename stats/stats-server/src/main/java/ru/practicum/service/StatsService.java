@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.exception.WrongDataException;
@@ -21,6 +22,7 @@ public class StatsService {
         this.statsRepository = statsRepository;
     }
 
+    @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
 
         if (endpointHitDto.getApp() == null || endpointHitDto.getApp().isEmpty()) {

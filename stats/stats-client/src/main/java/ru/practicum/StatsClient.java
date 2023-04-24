@@ -12,10 +12,10 @@ import java.util.List;
 
 @Service
 public class StatsClient {
-    private final String url = "http://stats-server:9090";
+    private static final String URL = "http://stats-server:9090";
     private final RestTemplate restTemplate;
 
-    private final WebClient webClient = WebClient.create(url);
+    private final WebClient webClient = WebClient.create(URL);
 
     @Autowired
     public StatsClient(RestTemplate restTemplate) {
