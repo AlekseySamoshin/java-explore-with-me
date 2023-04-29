@@ -3,6 +3,7 @@ package ru.practicum.service;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.EventFullDto;
+import ru.practicum.dto.UpdateEventAdminRequest;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class EventService {
         return new EventFullDto();
     }
 
-    public EventFullDto updateEvent(Long eventId, EventFullDto eventFullDto) {
+    public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest eventFullDto) {
 //        дата начала изменяемого события должна быть не ранее чем за час от даты публикации. (Ожидается код ошибки 409)
 //        событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
 //        событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)

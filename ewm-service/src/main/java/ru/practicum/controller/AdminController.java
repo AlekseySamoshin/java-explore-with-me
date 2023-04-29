@@ -97,9 +97,9 @@ public class AdminController {
                                   @RequestParam String rangeStart,
                                   @RequestParam String rangeEnd,
                                   @RequestParam(defaultValue = "0") Integer from,
-                                  @RequestParam(defaultValue = "10") Integer to) {
+                                  @RequestParam(defaultValue = "10") Integer size) {
 //        Поиск событий
-        return eventService.getEvents(users, states,categories, rangeStart, rangeEnd, from, to);
+        return eventService.getEvents(users, states,categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/events/{eventId}")

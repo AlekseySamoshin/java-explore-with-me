@@ -11,7 +11,6 @@ public class UserDtoMapper {
         return new UserShortDto();
     }
 
-
     public User mapDtoToUser(UserDto userDto) {
         return new User();
     }

@@ -25,8 +25,8 @@ public class PublicController {
 
     @GetMapping("/compilations")
     public List<CompilationDto> getCompilations(@RequestParam Boolean pinned,
-                                          @RequestParam Integer from,
-                                          @RequestParam Integer size) {
+                                                @RequestParam(defaultValue = "0") Integer from,
+                                                @RequestParam(defaultValue = "10") Integer size) {
 //    Получение подборок событий
         return eventService.getCompilations(pinned, from, size);
     }
@@ -58,8 +58,8 @@ public class PublicController {
                                                     @RequestParam String rangeEnd,
                                                     @RequestParam Boolean onlyAvailable,
                                                     @RequestParam String sort,
-                                                    @RequestParam Integer from,
-                                                    @RequestParam Integer size) {
+                                                    @RequestParam(defaultValue = "0") Integer from,
+                                                    @RequestParam(defaultValue = "10") Integer size) {
 //    это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
 //    текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
 //    если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
@@ -67,7 +67,7 @@ public class PublicController {
 //    информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
 
 //    Получение событий с возможностью фильтрации
-        return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, sizes);
+        return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
     @GetMapping("/events/{id}")

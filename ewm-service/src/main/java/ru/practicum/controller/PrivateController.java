@@ -2,9 +2,7 @@ package ru.practicum.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.EventFullDto;
-import ru.practicum.dto.EventShortDto;
-import ru.practicum.dto.ParticipationRequestDto;
+import ru.practicum.dto.*;
 import ru.practicum.service.EventService;
 
 import java.util.List;
@@ -21,8 +19,8 @@ public class PrivateController {
 
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getEventsByUser(@PathVariable Long userId,
-                                               @RequestParam Integer from,
-                                               @RequestParam Integer size) {
+                                               @RequestParam(defaultValue = "0") Integer from,
+                                               @RequestParam(defaultValue = "10") Integer size) {
 //        Получение событий, добавленных текущим пользователем
         return eventService.getEventsByUser(userId, from, size);
     }
