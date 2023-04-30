@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/admin")
+@Slf4j
 public class AdminController {
     private final UserService userService;
     private final EventService eventService;
@@ -32,23 +34,24 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public List<UserDto> getUsers(@RequestParam List<Long> ids,
-                                       @RequestParam(required = false, defaultValue = "0") Long from,
-                                       @RequestParam(required = false, defaultValue = "10") Long size) {
+    public List<UserShortDto> getUsers(@RequestParam List<Long> ids,
+                                       @RequestParam(required = false, defaultValue = "0") Integer from,
+                                       @RequestParam(required = false, defaultValue = "10") Integer size) {
 
-//        Получение информации о пользователях
+        log.info("Запрос: Получение информации о пользователях");
         return userService.getUsers(ids, from, size);
     }
 
     @PostMapping("/users")
     public UserDto createUser(@RequestBody NewUserRequest newUserDto) {
+        log.info("Запрос: Создание нового пользователя"
         return userService.addUser(newUserDto);
     }
 
     @DeleteMapping("/users/{userId}")
     public void deleteUser(@PathVariable Long userId) {
-//        Успешный ответ: код 204
-//        Удаление пользователя
+//        Успешный ответ: только код 204
+        log.info("Запрос: Удаление пользователя");
         userService.deleteUser(userId);
     }
 
@@ -63,16 +66,13 @@ public class AdminController {
 
     @PostMapping("/categories")
     public CategoryDto addCategory(@RequestBody NewCategoryDto categoryDto) {
-//        имя категории должно быть уникальным
-
-//        Добавление новой категории
+        log.info("Запрос: Добавление новой категории");
         return eventService.createCategory(categoryDto);
     }
 
     @DeleteMapping("/categories/{catId}")
     public void deleteCategory(@PathVariable Long catId) {
-//        с категорией не должно быть связано ни одного события.
-
+        log.info("Запрос: Удаление категории id=" + catId);
 //        Успешный ответ: код 204
         eventService.deleteCategoryById(catId);
     }
@@ -81,7 +81,7 @@ public class AdminController {
     public CategoryDto updateCategory(@PathVariable Long catId,
                                       @RequestBody CategoryDto categoryDto) {
 
-//        Изменение категории
+        log.info("Запрос: Изменение категории id=" + catId);
         return eventService.updateCategory(catId, categoryDto);
     }
 
@@ -98,7 +98,7 @@ public class AdminController {
                                   @RequestParam String rangeEnd,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {
-//        Поиск событий
+        log.info("Запрос: Поиск событий");
         return eventService.getEvents(users, states,categories, rangeStart, rangeEnd, from, size);
     }
 
@@ -109,7 +109,7 @@ public class AdminController {
 //        событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
 //        событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)
 
-//        Редактирование данных события и его статуса (отклонение/публикация).
+        log.info("Запрос: Редактирование данных события и его статуса");
         return eventService.updateEvent(eventId, eventFullDto);
     }
 

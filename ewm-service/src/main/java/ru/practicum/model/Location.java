@@ -1,9 +1,16 @@
 package ru.practicum.model;
 
-import javax.persistence.Entity;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Getter
+@Setter
 @Entity
+@Table(name = "locations")
 public class Location {
-    Float lat;
-    Float lon;
+    private Float lat;
+    private Float lon;
 }

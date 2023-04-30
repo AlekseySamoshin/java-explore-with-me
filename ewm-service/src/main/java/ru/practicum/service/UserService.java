@@ -1,9 +1,12 @@
 package ru.practicum.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.practicum.dto.NewUserRequest;
 import ru.practicum.dto.UserDto;
-import ru.practicum.dto.UserDtoMapper;
+import ru.practicum.dtoMapper.UserDtoMapper;
 import ru.practicum.dto.UserShortDto;
 import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService {
     UserRepository userRepository;
     UserDtoMapper userDtoMapper;
@@ -22,18 +26,20 @@ public class UserService {
         this.userDtoMapper = userDtoMapper;
     }
 
-    public List<UserShortDto> getUsers(List<Long> ids, Long from, Long size) {
-        return userRepository.findAllById(ids).stream()
+    public List<UserShortDto> getUsers(List<Long> ids, Integer from, Integer size) {
+        return userRepository.findAllByIdPageable(ids, PageRequest.of(from / size, size)).stream()
                 .map(user -> userDtoMapper.mapUserToShortDto(user))
                 .collect(Collectors.toList());
     }
 
-    public UserShortDto addUser(UserDto userDto) {
+    public UserDto addUser(NewUserRequest userDto) {
         User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
-        return userDtoMapper.mapUserToShortDto(savedUser);
+        log.info("Пользователь сохранен с id=" + savedUser.getId());
+        return userDtoMapper.mapUserToDto(savedUser);
     }
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
+        log.info("Пользователь id=" + userId + " удален");
     }
 }

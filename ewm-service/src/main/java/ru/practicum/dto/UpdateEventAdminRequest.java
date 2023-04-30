@@ -1,31 +1,25 @@
 package ru.practicum.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.model.Location;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@Builder
 public class UpdateEventAdminRequest {
-    String annotation;
-//    maxLength: 2000
-//    minLength: 20
-
-    Long category;
-
-
-    String description;
-//    maxLength: 7000
-//    minLength: 20
-
-    String eventDate;
-//    example: 2023-10-11 23:10:05
-
-    Location location;
-    Boolean paid;
-
-    Integer participantLimit;
-
-    Boolean requestModeration;
-
-    String stateAction;
+    private String annotation;
+    private Long category;
+    private String description;
+    private String eventDate;
+    private Location location;
+    private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration;
+    private String stateAction;
 //    Enum: PUBLISH_EVENT, REJECT_EVENT
-
-    String title;
+    private String title;
 }
