@@ -126,7 +126,7 @@ public class AdminController {
                                             @RequestBody UpdateCompilationRequest compilationDto) {
 
 //        Обновить информацию о подборке
-        return compilationService.updateCompilation(compilationDto);
+        return compilationService.updateCompilation(compId, compilationDto);
     }
 
     @DeleteMapping("/compilations/{compId}")

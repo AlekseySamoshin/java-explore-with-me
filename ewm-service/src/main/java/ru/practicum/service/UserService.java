@@ -32,8 +32,8 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserDto addUser(NewUserRequest userDto) {
-        User savedUser = userRepository.save(userDtoMapper.mapDtoToUser(userDto));
+    public UserDto addUser(NewUserRequest newUserDto) {
+        User savedUser = userRepository.save(userDtoMapper.mapNewUserRequestToUser(newUserDto));
         log.info("Пользователь сохранен с id=" + savedUser.getId());
         return userDtoMapper.mapUserToDto(savedUser);
     }

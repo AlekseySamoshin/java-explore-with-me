@@ -50,14 +50,14 @@ public class EventService {
         if(LocalDateTime.now().isAfter(event.getEventDate().minus(1, ChronoUnit.HOURS))) {
             throw new ConflictException("До начала события меньше часа, изменение невозможно");
         }
-        if(!event.getState().equals(EventState.PENDING.toString())) {
+        if(!event.getState().equals(EventState.PENDING)) {
             throw new ConflictException("Событие не в состоянии ожидания публикации");
         }
         if((!updateRequest.getStateAction().equals(StateAction.REJECT_EVENT.toString())
-                && event.getState().equals(EventState.PUBLISHED.toString()))) {
+                && event.getState().equals(EventState.PUBLISHED))) {
             throw new ConflictException("Отклонить опубликованное событие невозможно");
         }
-        event = updateEventWithAdminRequest(event, updateRequest);
+        updateEventWithAdminRequest(event, updateRequest);
         event = eventRepository.save(event);
         return eventDtoMapper.mapEventToFullDto(event);
     }

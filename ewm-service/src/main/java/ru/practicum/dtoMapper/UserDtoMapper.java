@@ -1,5 +1,6 @@
 package ru.practicum.dtoMapper;
 
+import ru.practicum.dto.NewUserRequest;
 import ru.practicum.dto.UserDto;
 import ru.practicum.dto.UserShortDto;
 import ru.practicum.model.User;
@@ -22,6 +23,14 @@ public class UserDtoMapper {
                 userDto.getId(),
                 userDto.getEmail(),
                 userDto.getName()
+        );
+    }
+
+    public User mapNewUserRequestToUser(NewUserRequest newUser) {
+        return new User(
+                null,
+                newUser.getEmail(),
+                newUser.getName()
         );
     }
 }
