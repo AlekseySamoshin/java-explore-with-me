@@ -57,10 +57,7 @@ public class AdminController {
 
 
 
-
-
 //__________________________ C A T E G O R I E S _____________________________
-
 
 
 
@@ -86,12 +83,10 @@ public class AdminController {
     }
 
 
-
-
 //__________________________ E V E N T S _____________________________
 
     @GetMapping("/events")
-    public EventFullDto getEvents(@RequestParam List<Long> users,
+    public List<EventFullDto> getEvents(@RequestParam List<Long> users,
                                   @RequestParam List<String> states,
                                   @RequestParam List<Long> categories,
                                   @RequestParam String rangeStart,
@@ -112,9 +107,6 @@ public class AdminController {
         log.info("Запрос: Редактирование данных события и его статуса");
         return eventService.updateEvent(eventId, eventFullDto);
     }
-
-
-
 
 
 

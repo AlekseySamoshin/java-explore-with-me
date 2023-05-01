@@ -1,14 +1,17 @@
 package ru.practicum.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.UserShortDto;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "events")
 public class Event {
@@ -16,18 +19,19 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String annotation;
-    CategoryDto category;
+//    Long category;
+    Category category;
     Long confirmedRequests;
     String createdOn;
     String description;
-    String eventDate;
+    LocalDateTime eventDate;
     UserShortDto initiator;
     Location location;
     Boolean paid;
     Integer participantLimit;
     String publishedOn;
     Boolean requestModeration;
-    String state;
+    EventState state;
     String title;
     Long views;
 }
