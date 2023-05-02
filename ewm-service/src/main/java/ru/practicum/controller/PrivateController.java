@@ -42,19 +42,19 @@ public class PrivateController {
         return eventService.getEventOfUserByIds(userId, eventId);
     }
 
-
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEventOfUserByIds(@PathVariable Long userId,
-                                               @PathVariable Long eventId) {
+                                               @PathVariable Long eventId,
+                                               @RequestBody UpdateEventUserRequest request) {
         log.info("Запрос: Изменение события id=" + eventId + ", пользователем id=" + userId);
-        return eventService.updateEventOfUserByIds(userId, eventId);
+        return eventService.updateEventOfUserByIds(userId, eventId, request);
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
-    public ParticipationRequestDto getParticipationRequest(@PathVariable Long userId,
+    public List<ParticipationRequestDto> getParticipationRequest(@PathVariable Long userId,
                                                            @PathVariable Long eventId) {
         log.info("Запрос: Получение информации о запросах на участие в событии пользователя id=" + userId);
-        return eventService.getParticipationRequest(userId, eventId);
+        return eventService.getParticipationRequestsDto(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/requests")
@@ -78,7 +78,7 @@ public class PrivateController {
 //    нельзя участвовать в неопубликованном событии (Ожидается код ошибки 409)
 //    если у события достигнут лимит запросов на участие - необходимо вернуть ошибку (Ожидается код ошибки 409)
 //    если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
-        log.info("Запрос: Заявка пользователем id=" userId + " запроса на участие в событии id=" + evenId);
+        log.info("Запрос: Заявка пользователем id=" + userId + " запроса на участие в событии id=" + evenId);
         return eventService.addParticipationRequest(userId, evenId);
     }
 

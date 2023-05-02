@@ -44,7 +44,7 @@ public class AdminController {
 
     @PostMapping("/users")
     public UserDto createUser(@RequestBody NewUserRequest newUserDto) {
-        log.info("Запрос: Создание нового пользователя"
+        log.info("Запрос: Создание нового пользователя");
         return userService.addUser(newUserDto);
     }
 

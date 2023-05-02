@@ -4,21 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.dto.CategoryDto;
-import ru.practicum.dto.EventFullDto;
-import ru.practicum.dto.NewCategoryDto;
-import ru.practicum.dto.UpdateEventAdminRequest;
+import ru.practicum.dto.*;
 import ru.practicum.dtoMapper.CategoryDtoMapper;
 import ru.practicum.dtoMapper.EventDtoMapper;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.WrongDataException;
-import ru.practicum.model.Category;
-import ru.practicum.model.Event;
-import ru.practicum.model.EventState;
-import ru.practicum.model.StateAction;
+import ru.practicum.model.*;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.RequestRepository;
+import ru.practicum.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,12 +29,15 @@ public class EventService {
     private final CategoryDtoMapper categoryDtoMapper;
     private final EventDtoMapper eventDtoMapper;
     private final EventRepository eventRepository;
+    private final RequestDtoMapper requestDtoMapper;
+    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final RequestRepository requestRepository;
 
     public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
         LocalDateTime rangeStartDateTime = LocalDateTime.parse(rangeStart);
         LocalDateTime rangeEndDateTime = LocalDateTime.parse(rangeEnd);
-        return eventRepository.findAllEvents(users, states, categories, rangeStartDateTime, rangeEndDateTime, PageRequest.of(from/size, size)).stream()
+        return eventRepository.findAllEvents(users, states, categories, rangeStartDateTime, rangeEndDateTime, PageRequest.of(from / size, size)).stream()
                 .map(eventDtoMapper::mapEventToFullDto)
                 .collect(Collectors.toList());
     }
@@ -47,13 +46,13 @@ public class EventService {
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие id=" + eventId + " не найдено"));
 
-        if(LocalDateTime.now().isAfter(event.getEventDate().minus(1, ChronoUnit.HOURS))) {
+        if (LocalDateTime.now().isAfter(event.getEventDate().minus(1, ChronoUnit.HOURS))) {
             throw new ConflictException("До начала события меньше часа, изменение невозможно");
         }
-        if(!event.getState().equals(EventState.PENDING)) {
+        if (!event.getState().equals(EventState.PENDING)) {
             throw new ConflictException("Событие не в состоянии ожидания публикации");
         }
-        if((!updateRequest.getStateAction().equals(StateAction.REJECT_EVENT.toString())
+        if ((!updateRequest.getStateAction().equals(StateAction.REJECT_EVENT.toString())
                 && event.getState().equals(EventState.PUBLISHED))) {
             throw new ConflictException("Отклонить опубликованное событие невозможно");
         }
@@ -97,36 +96,114 @@ public class EventService {
     }
 
     public List<CategoryDto> getCategories(Integer from, Integer size) {
+        return categoryRepository.findAll(PageRequest.of(from / size, size)).stream()
+                .map(categoryDtoMapper::mapCategoryToDto)
+                .collect(Collectors.toList());
     }
 
-    private Event updateEventWithAdminRequest(Event event, UpdateEventAdminRequest updateRequest) {
-        if(updateRequest.getAnnotation() != null) {
+    public List<EventShortDto> getEventsByUser(Long userId, Integer from, Integer size) {
+        User user = getUserById(userId);
+        return eventRepository.findAllByUserId(user, PageRequest.of(from / size, size)).stream()
+                .map(eventDtoMapper::mapEventToShortDto)
+                .collect(Collectors.toList());
+    }
+
+    public EventFullDto addNewEventByUser(Long userId, NewEventDto newEvent) {
+        User user = getUserById(userId);
+        Category category = categoryRepository.findById(newEvent.getCategory()).orElseThrow(
+                () -> new NotFoundException("Категория id=" + newEvent.getCategory() + " не найдена")
+        );
+        Event event = eventRepository.save(eventDtoMapper.mapNewEventDtoToEvent(newEvent, category));
+        log.info("Событие сохранено с id=" + event.getId());
+        return eventDtoMapper.mapEventToFullDto(event);
+    }
+
+    public EventFullDto getEventOfUserByIds(Long userId, Long eventId) {
+        User user = getUserById(userId);
+        Event event = getEventById(eventId);
+        if (!user.getId().equals(event.getInitiator().getId())) {
+            throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
+        }
+        return eventDtoMapper.mapEventToFullDto(event);
+    }
+
+    public EventFullDto updateEventOfUserByIds(Long userId, Long eventId, UpdateEventUserRequest request) {
+        User user = getUserById(userId);
+        Event event = getEventById(eventId);
+        if (!user.getId().equals(event.getInitiator().getId())) {
+            throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
+        }
+        event = updateEventWithUserRequest(event, request);
+        return eventDtoMapper.mapEventToFullDto(event);
+    }
+
+    public List<ParticipationRequestDto> getParticipationRequestsDto(Long userId, Long eventId) {
+        List<ParticipationRequest> requests = getParticipationRequests(userId, eventId);
+        return requests.stream()
+                .map(requestDtoMapper::mapRequestToDto)
+                .collect(Collectors.toList());
+    }
+
+    public EventRequestStatusUpdateResult updateParticipationRequest(Long userId,
+                                                                     Long eventId,
+                                                                     EventRequestStatusUpdateRequest updateRequest) {
+        EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
+        List<ParticipationRequest> requests = getParticipationRequests(userId, eventId);
+        for (ParticipationRequest request : requests) {
+            if (updateRequest.getRequestIds().contains(request.getId())) {
+                request.setStatus(updateRequest.getStatus());
+            }
+        }
+        for (ParticipationRequest request : requests) {
+            switch (request.getStatus().toUpperCase()) {
+                case "CONFIRMED":
+                    result.getConfirmedRequests().add(request);
+                case "REJECTED":
+                    result.getRejectedRequests().add(request);
+                default:
+                    throw new WrongDataException("Неверный статус запроса подтверждения/отклонения");
+            }
+        }
+        return result;
+    }
+
+    private List<ParticipationRequest> getParticipationRequests(Long userId, Long eventId) {
+        User user = getUserById(userId);
+        Event event = getEventById(eventId);
+        if (!user.getId().equals(event.getInitiator().getId())) {
+            throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
+        }
+        return requestRepository.findByUserId(userId);
+    }
+
+    private Event updateEventWithUserRequest(Event event, UpdateEventUserRequest updateRequest) {
+        if (updateRequest.getAnnotation() != null) {
             event.setAnnotation(updateRequest.getAnnotation());
         }
-        if(updateRequest.getCategory() != null) {
+        if (updateRequest.getCategory() != null) {
             Category category = categoryRepository.findById(updateRequest.getCategory()).orElseThrow(
                     () -> new NotFoundException("Категория не найдена"));
             event.setCategory(category);
         }
-        if(updateRequest.getDescription() != null) {
+        if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());
         }
-        if(updateRequest.getEventDate() != null) {
+        if (updateRequest.getEventDate() != null) {
             event.setEventDate(LocalDateTime.parse(updateRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
-        if(updateRequest.getLocation() != null) {
+        if (updateRequest.getLocation() != null) {
             event.setLocation(updateRequest.getLocation());
         }
-        if(updateRequest.getPaid() != null) {
+        if (updateRequest.getPaid() != null) {
             event.setPaid(updateRequest.getPaid());
         }
-        if(updateRequest.getParticipantLimit() != null) {
+        if (updateRequest.getParticipantLimit() != null) {
             event.setParticipantLimit(updateRequest.getParticipantLimit());
         }
-        if(updateRequest.getRequestModeration() != null) {
+        if (updateRequest.getRequestModeration() != null) {
             event.setRequestModeration(updateRequest.getRequestModeration());
         }
-        if(updateRequest.getStateAction() != null) {
+        if (updateRequest.getStateAction() != null) {
             switch (updateRequest.getStateAction().toUpperCase()) {
                 case "PUBLISH_EVENT":
                     event.setState(EventState.PUBLISHED);
@@ -135,10 +212,62 @@ public class EventService {
                     event.setState(EventState.CANCELED);
                     break;
                 default:
-                    throw new WrongDataException("Неверный аргумент для публикации/отклонения события")
+                    throw new WrongDataException("Неверный аргумент для публикации/отклонения события");
             }
         }
-        if(updateRequest.getTitle() != null) {
+        return event;
+    }
+
+    private Event getEventById(Long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Событие id=" + eventId + " не найдено"));
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("Пользователь id=" + userId + " не найден"));
+    }
+
+    private Event updateEventWithAdminRequest(Event event, UpdateEventAdminRequest updateRequest) {
+        if (updateRequest.getAnnotation() != null) {
+            event.setAnnotation(updateRequest.getAnnotation());
+        }
+        if (updateRequest.getCategory() != null) {
+            Category category = categoryRepository.findById(updateRequest.getCategory()).orElseThrow(
+                    () -> new NotFoundException("Категория не найдена"));
+            event.setCategory(category);
+        }
+        if (updateRequest.getDescription() != null) {
+            event.setDescription(updateRequest.getDescription());
+        }
+        if (updateRequest.getEventDate() != null) {
+            event.setEventDate(LocalDateTime.parse(updateRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        }
+        if (updateRequest.getLocation() != null) {
+            event.setLocation(updateRequest.getLocation());
+        }
+        if (updateRequest.getPaid() != null) {
+            event.setPaid(updateRequest.getPaid());
+        }
+        if (updateRequest.getParticipantLimit() != null) {
+            event.setParticipantLimit(updateRequest.getParticipantLimit());
+        }
+        if (updateRequest.getRequestModeration() != null) {
+            event.setRequestModeration(updateRequest.getRequestModeration());
+        }
+        if (updateRequest.getStateAction() != null) {
+            switch (updateRequest.getStateAction().toUpperCase()) {
+                case "PUBLISH_EVENT":
+                    event.setState(EventState.PUBLISHED);
+                    break;
+                case "REJECT_EVENT":
+                    event.setState(EventState.CANCELED);
+                    break;
+                default:
+                    throw new WrongDataException("Неверный аргумент для публикации/отклонения события");
+            }
+        }
+        if (updateRequest.getTitle() != null) {
             event.setTitle(updateRequest.getTitle());
         }
         return event;

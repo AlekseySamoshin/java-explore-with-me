@@ -13,7 +13,7 @@ public class EventShortDto {
     private String annotation;
     private CategoryDto category;
     private String eventDate;
-    private String id;
+    private Long id;
     private UserShortDto initiator;
     private Boolean paid;
     private String title;
