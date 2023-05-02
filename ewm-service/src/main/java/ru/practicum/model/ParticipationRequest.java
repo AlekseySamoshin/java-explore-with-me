@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,7 +13,7 @@ import javax.persistence.Entity;
 @Builder
 public class ParticipationRequest {
     private Long id;
-    private String created;
+    private LocalDateTime created;
     private Event event;
     private Long requester;
     private String status;

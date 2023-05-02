@@ -73,11 +73,6 @@ public class PrivateController {
 
     @PostMapping("/{userId}/requests")
     public ParticipationRequestDto addParticipationRequest(@PathVariable Long userId, @RequestParam Long evenId) {
-//    нельзя добавить повторный запрос (Ожидается код ошибки 409)
-//    инициатор события не может добавить запрос на участие в своём событии (Ожидается код ошибки 409)
-//    нельзя участвовать в неопубликованном событии (Ожидается код ошибки 409)
-//    если у события достигнут лимит запросов на участие - необходимо вернуть ошибку (Ожидается код ошибки 409)
-//    если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
         log.info("Запрос: Заявка пользователем id=" + userId + " запроса на участие в событии id=" + evenId);
         return eventService.addParticipationRequest(userId, evenId);
     }
@@ -85,7 +80,7 @@ public class PrivateController {
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelParticipationRequest(@PathVariable Long userId,
                                                               @PathVariable Long requestId) {
-        log.info("Запрос: Отмена пользователем id=" userId + " запроса на участие  id=" + requestId);
+        log.info("Запрос: Отмена пользователем id=" + userId + " запроса на участие  id=" + requestId);
         return eventService.cancelParticipationRequest(userId, requestId);
     }
 }

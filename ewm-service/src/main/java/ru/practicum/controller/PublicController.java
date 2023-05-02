@@ -13,6 +13,7 @@ import ru.practicum.dto.EventShortDto;
 import ru.practicum.service.CompilationService;
 import ru.practicum.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -21,6 +22,7 @@ public class PublicController {
 
     EventService eventService;
     CompilationService compilationService;
+    HttpServletRequest request;
 
     @Autowired
     public PublicController(EventService eventService, CompilationService compilationService) {
@@ -65,14 +67,8 @@ public class PublicController {
                                                     @RequestParam String sort,
                                                     @RequestParam(defaultValue = "0") Integer from,
                                                     @RequestParam(defaultValue = "10") Integer size) {
-//    это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
-//    текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
-//    если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
-//    информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
-//    информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-
         log.info("Запрос: Получение событий с возможностью фильтрации");
-        return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr());
     }
 
     @GetMapping("/events/{id}")
