@@ -30,7 +30,6 @@ public class EventDtoMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().toString())
                 .title(event.getTitle())
-                .views(event.getViews())
                 .build();
     }
 
@@ -38,7 +37,6 @@ public class EventDtoMapper {
         return EventShortDto.builder()
                 .annotation(event.getAnnotation())
                 .title(event.getTitle())
-                .views(event.getViews())
                 .category(categoryDtoMapper.mapCategoryToDto(event.getCategory()))
                 .initiator(event.getInitiator())
                 .id(event.getId())

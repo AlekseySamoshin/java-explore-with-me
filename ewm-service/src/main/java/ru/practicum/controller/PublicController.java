@@ -77,6 +77,6 @@ public class PublicController {
 //    информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
     public EventFullDto getEventById(@PathVariable Long id) {
         log.info("Запрос: Получение подробной информации об опубликованном событии по его идентификатору");
-        return eventService.getEventById(id);
+        return eventService.getEventDtoById(id);
     }
 }

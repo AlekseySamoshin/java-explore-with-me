@@ -10,13 +10,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class EventShortDto {
+    private Long id;
     private String annotation;
     private Long confirmedRequests;
     private CategoryDto category;
     private String eventDate;
-    private Long id;
     private UserShortDto initiator;
     private Boolean paid;
     private String title;
-    private Long views;
+    private Integer views;
 }

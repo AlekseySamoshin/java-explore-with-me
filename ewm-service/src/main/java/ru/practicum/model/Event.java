@@ -8,6 +8,7 @@ import ru.practicum.dto.UserShortDto;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,13 +20,14 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String annotation;
-//    Long category;
     Category category;
     Long confirmedRequests;
     String createdOn;
     String description;
     LocalDateTime eventDate;
     UserShortDto initiator;
+
+    @OneToOne
     Location location;
     Boolean paid;
     Integer participantLimit;
@@ -33,5 +35,8 @@ public class Event {
     Boolean requestModeration;
     EventState state;
     String title;
-    Long views;
+
+    @ManyToMany
+    @JoinTable(name = "events_to_compilations")
+    List<Compilation> compilationList;
 }

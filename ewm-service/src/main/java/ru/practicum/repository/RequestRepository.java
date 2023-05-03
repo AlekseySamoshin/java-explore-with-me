@@ -14,5 +14,5 @@ public interface RequestRepository extends JpaRepository<ParticipationRequest, L
 
     @Query("select r from ParticipationRequest r " +
             "where r.event.id in :eventIds")
-    List<ParticipationRequest> finByEventIds(List<Long> eventIds);
+    List<ParticipationRequest> findByEventIds(List<Long> eventIds);
 }

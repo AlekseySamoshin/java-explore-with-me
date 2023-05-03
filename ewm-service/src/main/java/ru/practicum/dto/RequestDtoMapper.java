@@ -9,7 +9,7 @@ public class RequestDtoMapper {
                 .requester(participationRequest.getRequester())
                 .event(participationRequest.getEvent().getId())
                 .status(participationRequest.getStatus())
-                .created(participationRequest.getCreated())
+                .created(participationRequest.getCreated().toString())
                 .build();
     }
 }

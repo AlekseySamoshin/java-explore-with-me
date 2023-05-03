@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,9 +44,11 @@ public class EventService {
     public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
         LocalDateTime rangeStartDateTime = LocalDateTime.parse(rangeStart);
         LocalDateTime rangeEndDateTime = LocalDateTime.parse(rangeEnd);
-        return eventRepository.findAllEvents(users, states, categories, rangeStartDateTime, rangeEndDateTime, PageRequest.of(from / size, size)).stream()
+        List<EventFullDto> dtos = eventRepository.findAllEvents(users, states, categories, rangeStartDateTime, rangeEndDateTime, PageRequest.of(from / size, size)).stream()
                 .map(eventDtoMapper::mapEventToFullDto)
                 .collect(Collectors.toList());
+        dtos = getViewCounters(dtos);
+        return dtos;
     }
 
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) {
@@ -64,7 +67,8 @@ public class EventService {
         }
         updateEventWithAdminRequest(event, updateRequest);
         event = eventRepository.save(event);
-        return eventDtoMapper.mapEventToFullDto(event);
+        EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
+        return getViewsCounter(eventFullDto);
     }
 
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
@@ -121,7 +125,8 @@ public class EventService {
         );
         Event event = eventRepository.save(eventDtoMapper.mapNewEventDtoToEvent(newEvent, category));
         log.info("Событие сохранено с id=" + event.getId());
-        return eventDtoMapper.mapEventToFullDto(event);
+        EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
+        return getViewsCounter(eventFullDto);
     }
 
     public EventFullDto getEventOfUserByIds(Long userId, Long eventId) {
@@ -130,7 +135,8 @@ public class EventService {
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
         }
-        return eventDtoMapper.mapEventToFullDto(event);
+        EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
+        return getViewsCounter(eventFullDto);
     }
 
     public EventFullDto updateEventOfUserByIds(Long userId, Long eventId, UpdateEventUserRequest request) {
@@ -140,7 +146,8 @@ public class EventService {
             throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
         }
         event = updateEventWithUserRequest(event, request);
-        return eventDtoMapper.mapEventToFullDto(event);
+        EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
+        return getViewsCounter(eventFullDto);
     }
 
     public List<ParticipationRequestDto> getParticipationRequestsDto(Long userId, Long eventId) {
@@ -178,6 +185,12 @@ public class EventService {
         return requestRepository.findByUserId(userId).stream()
                 .map(requestDtoMapper::mapRequestToDto)
                 .collect(Collectors.toList());
+    }
+
+    public EventFullDto getEventDtoById(Long eventId) {
+        Event event = getEventById(eventId);
+        EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
+        return getViewsCounter(eventFullDto);
     }
 
     private List<ParticipationRequest> getParticipationRequests(Long userId, Long eventId) {
@@ -287,11 +300,6 @@ public class EventService {
     }
 
     public ParticipationRequestDto addParticipationRequest(Long userId, Long evenId) {
-//    нельзя добавить повторный запрос (Ожидается код ошибки 409)
-//    инициатор события не может добавить запрос на участие в своём событии (Ожидается код ошибки 409)
-//    нельзя участвовать в неопубликованном событии (Ожидается код ошибки 409)
-//    если у события достигнут лимит запросов на участие - необходимо вернуть ошибку (Ожидается код ошибки 409)
-//    если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
         User user = getUserById(userId);
         Event event = getEventById(evenId);
         List<ParticipationRequest> requests = getParticipationRequests(userId, evenId);
@@ -309,7 +317,6 @@ public class EventService {
                 throw new ConflictException("Оставить заявку повторно невозможно");
             }
         }
-
         ParticipationRequest newRequest = ParticipationRequest.builder()
                 .requester(userId)
                 .created(LocalDateTime.now())
@@ -351,11 +358,6 @@ public class EventService {
                                                     Integer from,
                                                     Integer size,
                                                     String ip) {
-//    + это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
-//    + текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
-//    + если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
-//   -+ информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
-//    + информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
         List<Event> events;
         LocalDateTime startDate;
         LocalDateTime endDate;
@@ -378,7 +380,6 @@ public class EventService {
                 .filter((event) -> event.getState().equals(EventState.PUBLISHED))
                 .collect(Collectors.toList());
 
-
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
                 .app("evm-service")
                 .uri("/events/")
@@ -386,16 +387,15 @@ public class EventService {
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat)))
                 .build();
         statsClient.saveHit(endpointHitDto);
-
         return createShortEventDtos(events);
     }
 
     private List<EventShortDto> createShortEventDtos(List<Event> events) {
-        List<Long> eventIds = new ArrayList<>();
+        HashMap<Long, Integer> eventIdsWithViewsCounter = new HashMap<>();
         for(Event event : events) {
-            eventIds.add(event.getId());
+            eventIdsWithViewsCounter.put(event.getId(), getViewsCounter(eventDtoMapper.mapEventToFullDto(event)).getViews());
         }
-        List<ParticipationRequest> requests = requestRepository.finByEventIds(eventIds);
+        List<ParticipationRequest> requests = requestRepository.findByEventIds(new ArrayList<>(eventIdsWithViewsCounter.keySet()));
         List<EventShortDto> dtos = events.stream().map(eventDtoMapper::mapEventToShortDto).collect(Collectors.toList());
         for(EventShortDto dto : dtos) {
             for(ParticipationRequest request : requests) {
@@ -403,6 +403,22 @@ public class EventService {
                     dto.setConfirmedRequests(dto.getConfirmedRequests() + 1);
                 }
             }
+            dto.setViews(eventIdsWithViewsCounter.get(dto.getId()));
+        }
+        return dtos;
+    }
+
+    private EventFullDto getViewsCounter(EventFullDto eventFullDto) {
+        Integer views = statsClient.getStats(eventFullDto.getCreatedOn(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat)),
+                List.of("/events/" + eventFullDto.getId()), true).size();
+        eventFullDto.setViews(views);
+        return eventFullDto;
+    }
+
+    private List<EventFullDto> getViewCounters(List<EventFullDto> dtos) {
+        for(EventFullDto dto : dtos) {
+            getViewsCounter(dto);
         }
         return dtos;
     }
