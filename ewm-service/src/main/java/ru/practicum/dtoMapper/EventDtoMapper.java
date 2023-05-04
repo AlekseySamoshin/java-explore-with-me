@@ -1,5 +1,6 @@
 package ru.practicum.dtoMapper;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
 import ru.practicum.dto.NewEventDto;
@@ -9,9 +10,11 @@ import ru.practicum.model.Event;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Component
 public class EventDtoMapper {
     private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
     CategoryDtoMapper categoryDtoMapper = new CategoryDtoMapper();
+    UserDtoMapper userDtoMapper = new UserDtoMapper();
 
     public EventFullDto mapEventToFullDto(Event event) {
         return EventFullDto.builder()
@@ -22,7 +25,7 @@ public class EventDtoMapper {
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate().format(DateTimeFormatter.ofPattern(dateTimeFormat)))
-                .initiator(event.getInitiator())
+                .initiator(userDtoMapper.mapUserToShortDto(event.getInitiator()))
                 .location(event.getLocation())
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
@@ -38,7 +41,7 @@ public class EventDtoMapper {
                 .annotation(event.getAnnotation())
                 .title(event.getTitle())
                 .category(categoryDtoMapper.mapCategoryToDto(event.getCategory()))
-                .initiator(event.getInitiator())
+                .initiator(userDtoMapper.mapUserToShortDto(event.getInitiator()))
                 .id(event.getId())
                 .paid(event.getPaid())
                 .eventDate(event.getEventDate().format(DateTimeFormatter.ofPattern(dateTimeFormat)))

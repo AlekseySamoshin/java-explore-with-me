@@ -27,7 +27,7 @@ public class UserService {
     }
 
     public List<UserShortDto> getUsers(List<Long> ids, Integer from, Integer size) {
-        return userRepository.findAllByIdPageable(ids, PageRequest.of(from / size, size)).stream()
+        return userRepository.findAllByIdsPageable(ids, PageRequest.of(from / size, size)).stream()
                 .map(user -> userDtoMapper.mapUserToShortDto(user))
                 .collect(Collectors.toList());
     }

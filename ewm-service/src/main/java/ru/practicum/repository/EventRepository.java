@@ -28,11 +28,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByUserId(User user, Pageable page);
 
     @Query("select e from Event e " +
-            "where (lower(e.annotation) like '%:text%' " +
-            "or lower(e.description) like '%text%') " +
-            "and e.startDate >= current_timestamp " +
-            "order by e.startDate desc")
-    List<Event> findEventsByText(String lowerCase, Pageable page);
+            "where (lower(e.annotation) like '%?1%' " +
+            "or lower(e.description) like '%?1%') " +
+            "and e.start_date > current_timestamp " +
+            "order by e.start_date desc")
+    List<Event> findEventsByText(String text, Pageable page);
 
     @Query("select e from Event e " +
             "where (lower(e.annotation) like '%:text%' " +

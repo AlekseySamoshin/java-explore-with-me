@@ -17,11 +17,26 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToMany
+//    @ManyToOne
+//    @JoinTable(name = "events_to_compilations",
+//            joinColumns = @JoinColumn(name = "compilation_id"),
+//            inverseJoinColumns = @JoinColumn(name = "event_id"))
+//            indexes = {
+//            @Index(name = "idx_event_id", columnList = "event_id")
+//            @Index(name = "idx_compilation_id", columnList = "compilation_id")
+//    })
+    @Transient
+    private List<Long> events;
+
+    private Boolean pinned;
+
+    private String title;
+
+    @ManyToOne
     @JoinTable(name = "events_to_compilations",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
-    List<Long> events;
-    Boolean pinned;
-    String title;
+    private void addEvent(Long eventId) {
+        events.add(eventId);
+    }
 }
