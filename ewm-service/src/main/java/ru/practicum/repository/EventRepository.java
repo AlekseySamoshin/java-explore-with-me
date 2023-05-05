@@ -3,6 +3,7 @@ package ru.practicum.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.model.Event;
 import ru.practicum.model.User;
 
@@ -13,11 +14,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByCategoryId(Long catId);
 
-    @Query("select e from Event e where e.initiator in :users" +
-            "and e.state in :states" +
-            "and e.categories in :categories" +
-            "and e.eventDate between :rangeStart and :rangeEnd" +
-            "order by e.eventDate desc")
+    @Query("select event from Event event where event.initiator.id in :users " +
+            "and event.state in :states " +
+            "and event.category.id in :categories " +
+            "and event.eventDate between :rangeStart and :rangeEnd " +
+            "order by event.eventDate desc")
     List<Event> findAllEvents(List<Long> users,
                               List<String> states,
                               List<Long> categories,
@@ -25,20 +26,21 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                               LocalDateTime rangeEnd,
                               Pageable page);
 
+    @Query("select event from Event event where event.initiator in :user")
     List<Event> findAllByUserId(User user, Pageable page);
 
-    @Query("select e from Event e " +
-            "where (lower(e.annotation) like '%?1%' " +
-            "or lower(e.description) like '%?1%') " +
-            "and e.start_date > current_timestamp " +
-            "order by e.start_date desc")
+    @Query("select event from Event event "
+//            "where (lower(e.annotation) like '%?1%' " +
+//            "or lower(e.description) like '%?1%') " +
+//            "and e.start_date > current_timestamp " +
+            /*"order by e.start_date desc"*/)
     List<Event> findEventsByText(String text, Pageable page);
 
-    @Query("select e from Event e " +
-            "where (lower(e.annotation) like '%:text%' " +
-            "or lower(e.description) like '%text%') " +
-            "and e.startDate >= :startDate " +
-            "and e.endDate <= :endDate " +
-            "order by e.startDate desc")
+    @Query("select event from Event event " +
+            "where (lower(event.annotation) like %:text% " +
+            "or lower(event.description) like %:text%) " +
+            "and event.eventDate >= :startDate " +
+            "and event.eventDate <= :endDate " +
+            "order by event.eventDate desc")
     List<Event> findAllByTextAndDateRange(String text, LocalDateTime startDate, LocalDateTime endDate, Pageable page);
 }

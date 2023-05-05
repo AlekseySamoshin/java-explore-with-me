@@ -1,7 +1,10 @@
-package ru.practicum.dto;
+package ru.practicum.dtoMapper;
 
+import org.springframework.stereotype.Component;
+import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.model.ParticipationRequest;
 
+@Component
 public class RequestDtoMapper {
     public ParticipationRequestDto mapRequestToDto(ParticipationRequest participationRequest) {
         return ParticipationRequestDto.builder()

@@ -9,6 +9,7 @@ import ru.practicum.StatsClient;
 import ru.practicum.dto.*;
 import ru.practicum.dtoMapper.CategoryDtoMapper;
 import ru.practicum.dtoMapper.EventDtoMapper;
+import ru.practicum.dtoMapper.RequestDtoMapper;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.WrongDataException;
