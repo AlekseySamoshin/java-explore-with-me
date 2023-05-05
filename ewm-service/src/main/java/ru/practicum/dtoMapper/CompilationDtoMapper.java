@@ -1,10 +1,12 @@
 package ru.practicum.dtoMapper;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.UpdateCompilationRequest;
 import ru.practicum.model.Compilation;
 
+@Component
 public class CompilationDtoMapper {
     public Compilation mapNewCompilationDtoToCompilation(NewCompilationDto dto) {
         return Compilation.builder()
