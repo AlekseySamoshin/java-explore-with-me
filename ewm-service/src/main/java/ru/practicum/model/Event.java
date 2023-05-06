@@ -3,6 +3,7 @@ package ru.practicum.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.dto.UserShortDto;
 
 import javax.persistence.*;
@@ -22,6 +23,10 @@ public class Event {
 
     String annotation;
 
+//    @OneToOne
+//    @ToString.Exclude
+//    @JoinColumn(name = "id")
+//    @Transient
     @ManyToOne
     @JoinTable(name = "categories")
     Category category;
