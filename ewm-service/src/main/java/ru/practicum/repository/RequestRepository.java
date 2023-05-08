@@ -13,6 +13,10 @@ public interface RequestRepository extends JpaRepository<ParticipationRequest, L
     List<ParticipationRequest> findByUserId(Long userId);
 
     @Query("select r from ParticipationRequest r " +
+            "where r.event.id = :eventId")
+    List<ParticipationRequest> findByEventId(Long eventId);
+
+    @Query("select r from ParticipationRequest r " +
             "where r.event.id in :eventIds")
     List<ParticipationRequest> findByEventIds(List<Long> eventIds);
 }

@@ -18,10 +18,12 @@ public class Compilation {
     Long id;
 
     @Transient
+    @Column(nullable = false)
     private List<Long> events;
 
     private Boolean pinned;
 
+    @Column(nullable = false)
     private String title;
 
     @ManyToOne

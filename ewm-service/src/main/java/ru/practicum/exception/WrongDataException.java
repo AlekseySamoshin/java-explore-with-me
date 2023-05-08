@@ -1,7 +1,11 @@
 package ru.practicum.exception;
 
+import java.util.List;
+
 public class WrongDataException extends RuntimeException {
-    public WrongDataException(String message) {
+    String reason;
+    public WrongDataException(String message, String reason) {
         super(message);
+        this.reason = reason;
     }
 }

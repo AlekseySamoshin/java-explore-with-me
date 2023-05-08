@@ -2,6 +2,7 @@ package ru.practicum.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
 import ru.practicum.service.EventService;
@@ -28,6 +29,7 @@ public class PrivateController {
     }
 
     @PostMapping("/{userId}/events")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto addNewEventByUser(@PathVariable Long userId,
                                           @RequestBody NewEventDto newEvent) {
 
@@ -72,9 +74,11 @@ public class PrivateController {
     }
 
     @PostMapping("/{userId}/requests")
-    public ParticipationRequestDto addParticipationRequest(@PathVariable Long userId, @RequestParam Long evenId) {
-        log.info("Запрос: Заявка пользователем id=" + userId + " запроса на участие в событии id=" + evenId);
-        return eventService.addParticipationRequest(userId, evenId);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ParticipationRequestDto addParticipationRequest(@PathVariable Long userId,
+                                                           @RequestParam Long eventId) {
+        log.info("Запрос: Заявка пользователем id=" + userId + " запроса на участие в событии id=" + eventId);
+        return eventService.addParticipationRequest(userId, eventId);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")

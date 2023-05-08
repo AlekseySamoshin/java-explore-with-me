@@ -1,6 +1,7 @@
 package ru.practicum.dtoMapper;
 
 import org.springframework.stereotype.Component;
+import ru.practicum.Constants;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
 import ru.practicum.dto.NewEventDto;
@@ -13,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class EventDtoMapper {
-    private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+    private final String dateTimeFormat = Constants.DATE_TIME_FORMAT;
     CategoryDtoMapper categoryDtoMapper = new CategoryDtoMapper();
     UserDtoMapper userDtoMapper = new UserDtoMapper();
 

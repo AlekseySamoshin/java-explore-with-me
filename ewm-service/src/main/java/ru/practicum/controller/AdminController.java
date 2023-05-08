@@ -35,7 +35,7 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public List<UserShortDto> getUsers(@RequestParam List<Long> ids,
+    public List<UserDto> getUsers(@RequestParam List<Long> ids,
                                        @RequestParam(required = false, defaultValue = "0") Integer from,
                                        @RequestParam(required = false, defaultValue = "10") Integer size) {
 
@@ -44,14 +44,15 @@ public class AdminController {
     }
 
     @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@RequestBody NewUserRequest newUserDto) {
         log.info("Запрос: Создание нового пользователя");
         return userService.addUser(newUserDto);
     }
 
     @DeleteMapping("/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
-//        Успешный ответ: только код 204
         log.info("Запрос: Удаление пользователя");
         userService.deleteUser(userId);
     }
@@ -63,6 +64,7 @@ public class AdminController {
 
 
     @PostMapping("/categories")
+    @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto addCategory(@RequestBody NewCategoryDto categoryDto) {
         log.info("Запрос: Добавление новой категории");
         return eventService.addCategory(categoryDto);
@@ -96,16 +98,12 @@ public class AdminController {
                                   @RequestParam(required = false, defaultValue = "0") Integer from,
                                   @RequestParam(required = false, defaultValue = "10") Integer size) {
         log.info("Запрос: Поиск событий");
-        return eventService.getEvents(users, states,categories, rangeStart, rangeEnd, from, size);
+        return eventService.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long eventId,
                                     @RequestBody UpdateEventAdminRequest eventFullDto) {
-//        дата начала изменяемого события должна быть не ранее чем за час от даты публикации. (Ожидается код ошибки 409)
-//        событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
-//        событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)
-
         log.info("Запрос: Редактирование данных события и его статуса");
         return eventService.updateEvent(eventId, eventFullDto);
     }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.model.Event;
+import ru.practicum.model.EventState;
 import ru.practicum.model.User;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and event.eventDate between :rangeStart and :rangeEnd " +
             "order by event.eventDate desc")
     List<Event> findAllEventsWithDates(List<Long> users,
-                                       List<String> states,
+                                       List<EventState> states,
                                        List<Long> categories,
                                        LocalDateTime rangeStart,
                                        LocalDateTime rangeEnd,

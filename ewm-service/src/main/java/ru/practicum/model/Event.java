@@ -20,10 +20,10 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(length = 2000)
+    @Column(nullable = false, length = 2000)
     String annotation;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinTable(name = "events_to_categories",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -37,15 +37,18 @@ public class Event {
     @Column(length = 7000)
     String description;
 
-    @Column(name = "event_date")
+    @Column(nullable = false, name = "event_date")
     LocalDateTime eventDate;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+//    @Column(nullable = false)
     User initiator;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+//    @Column(nullable = false)
     Location location;
 
+    @Column(nullable = false)
     Boolean paid;
 
     @Column(name = "participant_limit")
@@ -59,6 +62,7 @@ public class Event {
 
     EventState state;
 
+    @Column(nullable = false)
     String title;
 
     @ManyToMany
