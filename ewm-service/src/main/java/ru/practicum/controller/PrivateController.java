@@ -32,7 +32,7 @@ public class PrivateController {
                                           @RequestBody NewEventDto newEvent) {
 
         log.info("Запрос: Добавление нового события пользователем id=" + userId);
-        return eventService.addNewEventByUser(userId, newEvent);
+        return eventService.addEvent(userId, newEvent);
     }
 
     @GetMapping("/{userId}/events/{eventId}")

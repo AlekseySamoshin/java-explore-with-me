@@ -17,6 +17,12 @@ public class UserDtoMapper {
     }
 
     public UserShortDto mapUserToShortDto(User user) {
+        if(user.getId() == null) {
+            return UserShortDto.builder()
+                    .id(null)
+                    .name(user.getName())
+                    .build();
+        }
         return new UserShortDto(user.getId(), user.getName());
     }
 

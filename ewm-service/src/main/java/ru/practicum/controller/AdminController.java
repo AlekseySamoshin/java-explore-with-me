@@ -2,6 +2,7 @@ package ru.practicum.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
 import ru.practicum.service.CompilationService;
@@ -64,10 +65,11 @@ public class AdminController {
     @PostMapping("/categories")
     public CategoryDto addCategory(@RequestBody NewCategoryDto categoryDto) {
         log.info("Запрос: Добавление новой категории");
-        return eventService.createCategory(categoryDto);
+        return eventService.addCategory(categoryDto);
     }
 
     @DeleteMapping("/categories/{catId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long catId) {
         log.info("Запрос: Удаление категории id=" + catId);
 //        Успешный ответ: код 204
@@ -87,12 +89,12 @@ public class AdminController {
 
     @GetMapping("/events")
     public List<EventFullDto> getEvents(@RequestParam List<Long> users,
-                                  @RequestParam List<String> states,
-                                  @RequestParam List<Long> categories,
-                                  @RequestParam String rangeStart,
-                                  @RequestParam String rangeEnd,
-                                  @RequestParam(defaultValue = "0") Integer from,
-                                  @RequestParam(defaultValue = "10") Integer size) {
+                                  @RequestParam(required = false) List<String> states,
+                                  @RequestParam(required = false) List<Long> categories,
+                                  @RequestParam(required = false) String rangeStart,
+                                  @RequestParam(required = false) String rangeEnd,
+                                  @RequestParam(required = false, defaultValue = "0") Integer from,
+                                  @RequestParam(required = false, defaultValue = "10") Integer size) {
         log.info("Запрос: Поиск событий");
         return eventService.getEvents(users, states,categories, rangeStart, rangeEnd, from, size);
     }

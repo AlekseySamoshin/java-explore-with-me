@@ -49,8 +49,8 @@ CREATE TABLE compilations (
 
 CREATE TABLE events_to_compilations (
     event_id       BIGINT REFERENCES events (id) ON DELETE CASCADE,
-    compilation_id BIGINT REFERENCES compilations (id) ON DELETE CASCADE,
-    CONSTRAINT unique_event_comp UNIQUE(event_id, compilation_id)
+    compilation_id BIGINT REFERENCES compilations (id) ON DELETE CASCADE
+--    CONSTRAINT unique_event_comp UNIQUE(event_id, compilation_id)
 );
 
 CREATE TABLE IF NOT EXISTS requests (

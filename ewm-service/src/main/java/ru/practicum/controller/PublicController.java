@@ -14,6 +14,8 @@ import ru.practicum.service.CompilationService;
 import ru.practicum.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -22,7 +24,6 @@ public class PublicController {
 
     EventService eventService;
     CompilationService compilationService;
-    HttpServletRequest request;
 
     @Autowired
     public PublicController(EventService eventService, CompilationService compilationService) {
@@ -31,7 +32,7 @@ public class PublicController {
     }
 
     @GetMapping("/compilations")
-    public List<CompilationDto> getCompilations(@RequestParam Boolean pinned,
+    public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "true") Boolean pinned,
                                                 @RequestParam(defaultValue = "0") Integer from,
                                                 @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрос: Получение подборок событий");
@@ -45,8 +46,8 @@ public class PublicController {
     }
 
     @GetMapping("/categories")
-    public List<CategoryDto> getCategories(@RequestParam Integer from,
-                                           @RequestParam Integer size) {
+    public List<CategoryDto> getCategories(@RequestParam(required = false, defaultValue = "0") Integer from,
+                                           @RequestParam(required = false, defaultValue = "10") Integer size) {
         log.info("Запрос: Получение категорий");
         return eventService.getCategories(from, size);
     }
@@ -58,15 +59,16 @@ public class PublicController {
     }
 
     @GetMapping("/events")
-    public List<EventShortDto> getEventsWithFilters(@RequestParam String text,
-                                                    @RequestParam List<Integer> categories,
-                                                    @RequestParam Boolean paid,
-                                                    @RequestParam String rangeStart,
-                                                    @RequestParam String rangeEnd,
-                                                    @RequestParam Boolean onlyAvailable,
-                                                    @RequestParam String sort,
-                                                    @RequestParam(defaultValue = "0") Integer from,
-                                                    @RequestParam(defaultValue = "10") Integer size) {
+    public List<EventShortDto> getEventsWithFilters(@RequestParam(required = false) String text,
+                                                    @RequestParam(required = false) List<Integer> categories,
+                                                    @RequestParam(required = false) Boolean paid,
+                                                    @RequestParam(required = false) String rangeStart,
+                                                    @RequestParam(required = false) String rangeEnd,
+                                                    @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
+                                                    @RequestParam(required = false) String sort,
+                                                    @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                    @Positive @RequestParam(defaultValue = "10") Integer size,
+                                                    HttpServletRequest request) {
         log.info("Запрос: Получение событий с возможностью фильтрации");
         return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr());
     }

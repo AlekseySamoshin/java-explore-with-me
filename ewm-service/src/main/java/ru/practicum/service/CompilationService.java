@@ -12,7 +12,6 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Compilation;
 import ru.practicum.repository.CompilationRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,12 +57,10 @@ public class CompilationService {
     }
 
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
-        if(pinned == null) {
-            return compilationRepository.findAll(PageRequest.of(from/size, size)).stream()
-                    .map(compilationDtoMapper::mapCompilationToDto)
-                    .collect(Collectors.toList());
-        }
-        return compilationRepository.findAllWithPinned(pinned, PageRequest.of(from/size, size));
+
+        return compilationRepository.findAll(pinned, PageRequest.of(from/size, size)).stream()
+                .map(compilationDtoMapper::mapCompilationToDto)
+                .collect(Collectors.toList());
     }
 
     public CompilationDto getCompilationById(Long compId) {

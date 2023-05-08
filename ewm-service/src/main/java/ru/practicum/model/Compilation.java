@@ -1,8 +1,6 @@
 package ru.practicum.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -11,20 +9,14 @@ import java.util.List;
 @Setter
 @Builder
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "compilations")
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-//    @ManyToOne
-//    @JoinTable(name = "events_to_compilations",
-//            joinColumns = @JoinColumn(name = "compilation_id"),
-//            inverseJoinColumns = @JoinColumn(name = "event_id"))
-//            indexes = {
-//            @Index(name = "idx_event_id", columnList = "event_id")
-//            @Index(name = "idx_compilation_id", columnList = "compilation_id")
-//    })
     @Transient
     private List<Long> events;
 

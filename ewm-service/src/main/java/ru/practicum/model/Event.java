@@ -1,9 +1,6 @@
 package ru.practicum.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.dto.UserShortDto;
 
 import javax.persistence.*;
@@ -12,6 +9,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "events")
@@ -21,32 +20,30 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(length = 2000)
     String annotation;
 
-//    @OneToOne
-//    @ToString.Exclude
-//    @JoinColumn(name = "id")
-//    @Transient
     @ManyToOne
-    @JoinTable(name = "categories")
+    @JoinTable(name = "events_to_categories",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
     Category category;
 
     Long confirmedRequests;
 
     @Column(name = "created_on")
-    String createdOn;
+    LocalDateTime createdOn;
 
+    @Column(length = 7000)
     String description;
 
     @Column(name = "event_date")
     LocalDateTime eventDate;
 
     @ManyToOne
-    @JoinTable(name = "users")
     User initiator;
 
     @ManyToOne
-    @JoinTable(name = "locations")
     Location location;
 
     Boolean paid;
@@ -55,7 +52,7 @@ public class Event {
     Integer participantLimit;
 
     @Column(name = "published_on")
-    String publishedOn;
+    LocalDateTime publishedOn;
 
     @Column(name = "request_moderation")
     Boolean requestModeration;

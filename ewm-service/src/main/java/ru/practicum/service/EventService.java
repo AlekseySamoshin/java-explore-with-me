@@ -14,10 +14,7 @@ import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.WrongDataException;
 import ru.practicum.model.*;
-import ru.practicum.repository.CategoryRepository;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.RequestRepository;
-import ru.practicum.repository.UserRepository;
+import ru.practicum.repository.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,17 +32,24 @@ public class EventService {
     private final EventDtoMapper eventDtoMapper;
     private final EventRepository eventRepository;
     private final RequestDtoMapper requestDtoMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
     private final StatsClient statsClient;
+    private final LocationRepository locationRepository;
 
     private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
     public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
-        LocalDateTime rangeStartDateTime = LocalDateTime.parse(rangeStart);
-        LocalDateTime rangeEndDateTime = LocalDateTime.parse(rangeEnd);
-        List<EventFullDto> dtos = eventRepository.findAllEvents(users, states, categories, rangeStartDateTime, rangeEndDateTime, PageRequest.of(from / size, size)).stream()
+        LocalDateTime rangeStartDateTime = null;
+        LocalDateTime rangeEndDateTime = null;
+        if(rangeStart != null) {
+            rangeStartDateTime = LocalDateTime.parse(rangeStart);
+        }
+        if(rangeEnd != null) {
+            rangeEndDateTime = LocalDateTime.parse(rangeEnd);
+        }
+        List<EventFullDto> dtos = eventRepository.findAllEventsWithDates(users, states, categories, rangeStartDateTime, rangeEndDateTime, PageRequest.of(from / size, size)).stream()
                 .map(eventDtoMapper::mapEventToFullDto)
                 .collect(Collectors.toList());
         dtos = getViewCounters(dtos);
@@ -72,7 +76,7 @@ public class EventService {
         return getViewsCounter(eventFullDto);
     }
 
-    public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
+    public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         Category category = categoryRepository.save(categoryDtoMapper.mapNewDtoToCategory(newCategoryDto));
         log.info("Категория сохранена с id=" + category.getId());
         return categoryDtoMapper.mapCategoryToDto(category);
@@ -113,25 +117,31 @@ public class EventService {
     }
 
     public List<EventShortDto> getEventsByUser(Long userId, Integer from, Integer size) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         return eventRepository.findAllByUserId(user, PageRequest.of(from / size, size)).stream()
                 .map(eventDtoMapper::mapEventToShortDto)
                 .collect(Collectors.toList());
     }
 
-    public EventFullDto addNewEventByUser(Long userId, NewEventDto newEvent) {
-        User user = getUserById(userId);
+    public EventFullDto addEvent(Long userId, NewEventDto newEvent) {
+        User user = userService.getUserById(userId);
         Category category = categoryRepository.findById(newEvent.getCategory()).orElseThrow(
                 () -> new NotFoundException("Категория id=" + newEvent.getCategory() + " не найдена")
         );
-        Event event = eventRepository.save(eventDtoMapper.mapNewEventDtoToEvent(newEvent, category));
+        Event event = eventDtoMapper.mapNewEventDtoToEvent(newEvent, category);
+        event.setLocation(locationRepository.save(event.getLocation()));
+        event.setInitiator(user);
+        event.setCreatedOn(LocalDateTime.now());
+        event.setState(EventState.PENDING);
+        log.info("Сохранена локация id = " + event.getLocation().getId() + " для нового события");
+        event = eventRepository.save(event);
         log.info("Событие сохранено с id=" + event.getId());
         EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
         return getViewsCounter(eventFullDto);
     }
 
     public EventFullDto getEventOfUserByIds(Long userId, Long eventId) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         Event event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
@@ -141,7 +151,7 @@ public class EventService {
     }
 
     public EventFullDto updateEventOfUserByIds(Long userId, Long eventId, UpdateEventUserRequest request) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         Event event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
@@ -182,7 +192,7 @@ public class EventService {
     }
 
     public List<ParticipationRequestDto> getParticipationRequestsByUserId(Long userId) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         return requestRepository.findByUserId(userId).stream()
                 .map(requestDtoMapper::mapRequestToDto)
                 .collect(Collectors.toList());
@@ -195,12 +205,17 @@ public class EventService {
     }
 
     private List<ParticipationRequest> getParticipationRequests(Long userId, Long eventId) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         Event event = getEventById(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new WrongDataException("Пользователь id=" + userId + " не инициатор события id=" + eventId);
         }
         return requestRepository.findByUserId(userId);
+    }
+
+    private Event getEventById(Long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Событие id=" + eventId + " не найдено"));
     }
 
     private Event updateEventWithUserRequest(Event event, UpdateEventUserRequest updateRequest) {
@@ -245,16 +260,6 @@ public class EventService {
         return event;
     }
 
-    private Event getEventById(Long eventId) {
-        return eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Событие id=" + eventId + " не найдено"));
-    }
-
-    private User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь id=" + userId + " не найден"));
-    }
-
     private Event updateEventWithAdminRequest(Event event, UpdateEventAdminRequest updateRequest) {
         if (updateRequest.getAnnotation() != null) {
             event.setAnnotation(updateRequest.getAnnotation());
@@ -286,6 +291,7 @@ public class EventService {
             switch (updateRequest.getStateAction().toUpperCase()) {
                 case "PUBLISH_EVENT":
                     event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
                     break;
                 case "REJECT_EVENT":
                     event.setState(EventState.CANCELED);
@@ -301,7 +307,7 @@ public class EventService {
     }
 
     public ParticipationRequestDto addParticipationRequest(Long userId, Long evenId) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         Event event = getEventById(evenId);
         List<ParticipationRequest> requests = getParticipationRequests(userId, evenId);
         if (event.getInitiator().getId().equals(userId)) {
@@ -331,7 +337,7 @@ public class EventService {
     }
 
     public ParticipationRequestDto cancelParticipationRequest(Long userId, Long requestId) {
-        User user = getUserById(userId);
+        User user = userService.getUserById(userId);
         ParticipationRequest request = requestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException("Запрос id=" + requestId + " не найден")
         );
@@ -387,7 +393,7 @@ public class EventService {
                 .ip(ip)
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat)))
                 .build();
-        statsClient.saveHit(endpointHitDto);
+//        statsClient.saveHit(endpointHitDto);
         return createShortEventDtos(events);
     }
 
@@ -410,10 +416,10 @@ public class EventService {
     }
 
     private EventFullDto getViewsCounter(EventFullDto eventFullDto) {
-        Integer views = statsClient.getStats(eventFullDto.getCreatedOn(),
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat)),
-                List.of("/events/" + eventFullDto.getId()), true).size();
-        eventFullDto.setViews(views);
+//        Integer views = statsClient.getStats(eventFullDto.getCreatedOn(),
+//                LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat)),
+//                List.of("/events/" + eventFullDto.getId()), true).size();
+//        eventFullDto.setViews(views);
         return eventFullDto;
     }
 
