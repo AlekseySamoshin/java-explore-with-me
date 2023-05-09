@@ -19,7 +19,7 @@ public class EventDtoMapper {
     UserDtoMapper userDtoMapper = new UserDtoMapper();
 
     public EventFullDto mapEventToFullDto(Event event) {
-        if(event.getState() == null) {
+        if (event.getState() == null) {
             event.setState(EventState.PENDING);
         }
         return EventFullDto.builder()
@@ -68,7 +68,7 @@ public class EventDtoMapper {
     }
 
     private String checkPublishedOn(Event event) {
-        if(event.getPublishedOn() == null) {
+        if (event.getPublishedOn() == null) {
             return null;
         }
         return event.getPublishedOn().format(DateTimeFormatter.ofPattern(dateTimeFormat));

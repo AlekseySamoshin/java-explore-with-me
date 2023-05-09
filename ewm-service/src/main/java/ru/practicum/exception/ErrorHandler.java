@@ -1,7 +1,6 @@
 package ru.practicum.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.PropertyValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,7 +10,6 @@ import ru.practicum.Constants;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -71,7 +69,7 @@ public class ErrorHandler {
                 .errors(Arrays.stream(e.getStackTrace())
                         .map(Object::toString)
                         .collect(Collectors.toList()))
-                .message("ошибка валидации данных")
+                .message("ошибка валидации данных" )
                 .reason(e.getMessage())
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT)))

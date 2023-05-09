@@ -6,14 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users" )
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

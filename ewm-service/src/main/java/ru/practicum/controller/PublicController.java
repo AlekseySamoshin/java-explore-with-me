@@ -31,54 +31,51 @@ public class PublicController {
         this.compilationService = compilationService;
     }
 
-    @GetMapping("/compilations")
-    public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "true") Boolean pinned,
-                                                @RequestParam(defaultValue = "0") Integer from,
-                                                @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Запрос: Получение подборок событий");
+    @GetMapping("/compilations" )
+    public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "true" ) Boolean pinned,
+                                                @RequestParam(defaultValue = "0" ) Integer from,
+                                                @RequestParam(defaultValue = "10" ) Integer size) {
+        log.info("Запрос: Получение подборок событий" );
         return compilationService.getCompilations(pinned, from, size);
     }
 
-    @GetMapping("/compilations/{compId}")
+    @GetMapping("/compilations/{compId}" )
     public CompilationDto getCompilationById(@PathVariable Long compId) {
-        log.info("Запрос: Получение подборки событий по его id");
+        log.info("Запрос: Получение подборки событий по его id" );
         return compilationService.getCompilationById(compId);
     }
 
-    @GetMapping("/categories")
-    public List<CategoryDto> getCategories(@RequestParam(required = false, defaultValue = "0") Integer from,
-                                           @RequestParam(required = false, defaultValue = "10") Integer size) {
-        log.info("Запрос: Получение категорий");
+    @GetMapping("/categories" )
+    public List<CategoryDto> getCategories(@RequestParam(required = false, defaultValue = "0" ) Integer from,
+                                           @RequestParam(required = false, defaultValue = "10" ) Integer size) {
+        log.info("Запрос: Получение категорий" );
         return eventService.getCategories(from, size);
     }
 
-    @GetMapping("/categories/{catId}")
+    @GetMapping("/categories/{catId}" )
     public CategoryDto getCategoryById(@PathVariable Long catId) {
-        log.info("Запрос: Получение информации о категории по её идентификатору");
+        log.info("Запрос: Получение информации о категории по её идентификатору" );
         return eventService.getCategoryById(catId);
     }
 
-    @GetMapping("/events")
+    @GetMapping("/events" )
     public List<EventShortDto> getEventsWithFilters(@RequestParam(required = false) String text,
                                                     @RequestParam(required = false) List<Integer> categories,
                                                     @RequestParam(required = false) Boolean paid,
                                                     @RequestParam(required = false) String rangeStart,
                                                     @RequestParam(required = false) String rangeEnd,
-                                                    @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
+                                                    @RequestParam(required = false, defaultValue = "false" ) Boolean onlyAvailable,
                                                     @RequestParam(required = false) String sort,
-                                                    @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                    @Positive @RequestParam(defaultValue = "10") Integer size,
+                                                    @PositiveOrZero @RequestParam(defaultValue = "0" ) Integer from,
+                                                    @Positive @RequestParam(defaultValue = "10" ) Integer size,
                                                     HttpServletRequest request) {
-        log.info("Запрос: Получение событий с возможностью фильтрации");
+        log.info("Запрос: Получение событий с возможностью фильтрации" );
         return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr());
     }
 
-    @GetMapping("/events/{id}")
-//    событие должно быть опубликовано
-//    информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
-//    информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
+    @GetMapping("/events/{id}" )
     public EventFullDto getEventById(@PathVariable Long id) {
-        log.info("Запрос: Получение подробной информации об опубликованном событии по его идентификатору");
+        log.info("Запрос: Получение подробной информации об опубликованном событии по его идентификатору" );
         return eventService.getEventDtoById(id);
     }
 }

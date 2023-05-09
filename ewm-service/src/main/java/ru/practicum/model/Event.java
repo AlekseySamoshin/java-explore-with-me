@@ -1,7 +1,6 @@
 package ru.practicum.model;
 
 import lombok.*;
-import ru.practicum.dto.UserShortDto;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "events")
+@Table(name = "events" )
 public class Event {
 
     @Id
@@ -25,39 +24,37 @@ public class Event {
 
     @ManyToOne(optional = false)
     @JoinTable(name = "events_to_categories",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
+            joinColumns = @JoinColumn(name = "event_id" ),
+            inverseJoinColumns = @JoinColumn(name = "category_id" ))
     Category category;
 
     Long confirmedRequests;
 
-    @Column(name = "created_on")
+    @Column(name = "created_on" )
     LocalDateTime createdOn;
 
     @Column(length = 7000)
     String description;
 
-    @Column(nullable = false, name = "event_date")
+    @Column(nullable = false, name = "event_date" )
     LocalDateTime eventDate;
 
     @ManyToOne(optional = false)
-//    @Column(nullable = false)
     User initiator;
 
     @ManyToOne(optional = false)
-//    @Column(nullable = false)
     Location location;
 
     @Column(nullable = false)
     Boolean paid;
 
-    @Column(name = "participant_limit")
+    @Column(name = "participant_limit" )
     Integer participantLimit;
 
-    @Column(name = "published_on")
+    @Column(name = "published_on" )
     LocalDateTime publishedOn;
 
-    @Column(name = "request_moderation")
+    @Column(name = "request_moderation" )
     Boolean requestModeration;
 
     EventState state;
@@ -67,7 +64,7 @@ public class Event {
 
     @ManyToMany
     @JoinTable(name = "events_to_compilations",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "compilation_id"))
+            joinColumns = @JoinColumn(name = "compilation_id" ),
+            inverseJoinColumns = @JoinColumn(name = "event_id" ))
     List<Compilation> compilationList;
 }

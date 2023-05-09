@@ -15,7 +15,10 @@ import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.WrongDataException;
 import ru.practicum.model.*;
-import ru.practicum.repository.*;
+import ru.practicum.repository.CategoryRepository;
+import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.LocationRepository;
+import ru.practicum.repository.RequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -79,8 +82,9 @@ public class EventService {
         }
         updateEventWithAdminRequest(event, updateRequest);
         if (event.getEventDate().isBefore(LocalDateTime.now())) {
-            throw new ConflictException(errorMessage, "событие уже прошло");
+            throw new ConflictException(errorMessage, "событие уже прошло" );
         }
+        saveLocation(event);
         event = eventRepository.save(event);
         EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
         return getViewsCounter(eventFullDto);
@@ -88,7 +92,7 @@ public class EventService {
 
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         if (categoryRepository.findByName(newCategoryDto.getName()).size() > 0) {
-            throw new ConflictException("не удалось создать категорию", "название (" + newCategoryDto.getName() +") уже занято");
+            throw new ConflictException("не удалось создать категорию", "название (" + newCategoryDto.getName() + ") уже занято" );
         }
         Category category = categoryRepository.save(categoryDtoMapper.mapNewDtoToCategory(newCategoryDto));
         log.info("Категория сохранена с id=" + category.getId());
@@ -112,7 +116,7 @@ public class EventService {
             throw new WrongDataException("не удалось обновить категорию", "Передано пустое поле name" );
         }
         if (categoryRepository.findByName(categoryDto.getName()).size() > 0) {
-            throw new ConflictException("не удалось обновить категорию id=" + category.getId(), "название (" + categoryDto.getName() +") уже занято");
+            throw new ConflictException("не удалось обновить категорию id=" + category.getId(), "название (" + categoryDto.getName() + ") уже занято" );
         }
         category.setName(categoryDto.getName());
         return categoryDtoMapper.mapCategoryToDto(category);
@@ -145,8 +149,7 @@ public class EventService {
                 () -> new NotFoundException("не удалось добавить событие", "Категория id=" + newEvent.getCategory() + " не найдена" )
         );
         Event event = eventDtoMapper.mapNewEventDtoToEvent(newEvent, category);
-        event.setLocation(locationRepository.save(event.getLocation()));
-        log.info("Сохранена локация id = " + event.getLocation().getId() + " для нового события" );
+        saveLocation(event);
         event.setInitiator(user);
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
@@ -157,6 +160,11 @@ public class EventService {
         log.info("Событие сохранено с id=" + event.getId());
         EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
         return getViewsCounter(eventFullDto);
+    }
+
+    private void saveLocation(Event event) {
+        event.setLocation(locationRepository.save(event.getLocation()));
+        log.info("Сохранена локация id = " + event.getLocation().getId() + " для нового события" );
     }
 
     public EventFullDto getEventOfUserByIds(Long userId, Long eventId) {
@@ -176,6 +184,8 @@ public class EventService {
             throw new WrongDataException("не удалось обновить событие", "Пользователь id=" + userId + " не инициатор события id=" + eventId);
         }
         event = updateEventWithUserRequest(event, request);
+        saveLocation(event);
+        eventRepository.save(event);
         EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
         return getViewsCounter(eventFullDto);
     }
@@ -194,7 +204,7 @@ public class EventService {
         Event event = getEventById(eventId);
         List<ParticipationRequest> requests = getParticipationRequestsByEventId(eventId);
         if (participationLimitIsFull(event, requests)) {
-            throw new ConflictException("обновление события id=" + eventId + " невозможно", "достигнут лимит заявок");
+            throw new ConflictException("обновление события id=" + eventId + " невозможно", "достигнут лимит заявок" );
         }
         for (ParticipationRequest request : requests) {
             if (updateRequest.getRequestIds().contains(request.getId())) {
@@ -202,7 +212,7 @@ public class EventService {
             }
         }
         for (ParticipationRequest request : requests) {
-            if (request.getStatus().equals("CONFIRMED" ) || request.getStatus().equals("REJECTED" ) || request.getStatus().equals("PENDING")) {
+            if (request.getStatus().equals("CONFIRMED" ) || request.getStatus().equals("REJECTED" ) || request.getStatus().equals("PENDING" )) {
                 result.addRequest(request);
                 requestRepository.save(request);
             } else {
@@ -214,6 +224,7 @@ public class EventService {
 
     public List<ParticipationRequestDto> getParticipationRequestsByUserId(Long userId) {
         User user = userService.getUserById(userId);
+
         return requestRepository.findByUserId(userId).stream()
                 .map(requestDtoMapper::mapRequestToDto)
                 .collect(Collectors.toList());
@@ -228,7 +239,7 @@ public class EventService {
     private boolean participationLimitIsFull(Event event, List<ParticipationRequest> requests) {
         Integer confirmedRequestsCounter = 0;
         for (ParticipationRequest request : requests) {
-            if (request.getStatus().equals("ACCEPTED") || request.getStatus().equals("CONFIRMED")) {
+            if (request.getStatus().equals("ACCEPTED" ) || request.getStatus().equals("CONFIRMED" )) {
                 confirmedRequestsCounter += 1;
             }
         }
@@ -245,7 +256,7 @@ public class EventService {
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new WrongDataException("не удалось найти запросы на участие", "Пользователь id=" + userId + " не инициатор события id=" + eventId);
         }
-        return requestRepository.findByUserId(userId);
+        return requestRepository.findByEventInitiatorId(userId);
     }
 
     private List<ParticipationRequest> getParticipationRequestsByEventId(Long eventId) {
@@ -296,15 +307,18 @@ public class EventService {
                 case "SEND_TO_REVIEW":
                     event.setState(EventState.PENDING);
                     break;
+                case "CANCEL_REVIEW":
+                    event.setState(EventState.CANCELED);
+                    break;
                 default:
                     throw new WrongDataException("не удалось обновить событие", "Неверный аргумент для публикации/отклонения события" );
             }
         }
         if (LocalDateTime.now().isAfter(event.getEventDate().minus(2, ChronoUnit.HOURS))) {
-            throw new ConflictException("не удалось обновить событие id=" + event.getId(), "до начала события осталось меньше 2 часов");
+            throw new ConflictException("не удалось обновить событие id=" + event.getId(), "до начала события осталось меньше 2 часов" );
         }
         if (event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException("не удалось обновить событие id=" + event.getId(), "нельзя изменить опубликованное событие");
+            throw new ConflictException("не удалось обновить событие id=" + event.getId(), "нельзя изменить опубликованное событие" );
         }
         return event;
     }
@@ -393,7 +407,7 @@ public class EventService {
         if (!request.getRequester().equals(userId)) {
             throw new ConflictException("не удалось отменить заявку", "Заявка id=" + requestId + " оставлена не пользователем id=" + userId);
         }
-        request.setStatus("CANCELLED" );
+        request.setStatus("CANCELED" );
         log.info("Отмена заявки на участие id=" + requestId);
         return requestDtoMapper.mapRequestToDto(requestRepository.save(request));
     }
@@ -435,7 +449,6 @@ public class EventService {
         events = events.stream()
                 .filter((event) -> event.getState().equals(EventState.PUBLISHED))
                 .collect(Collectors.toList());
-
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
                 .app("evm-service" )
                 .uri("/events/" )

@@ -20,6 +20,5 @@ public class UpdateEventAdminRequest {
     private Integer participantLimit;
     private Boolean requestModeration;
     private String stateAction;
-//    Enum: PUBLISH_EVENT, REJECT_EVENT
     private String title;
 }

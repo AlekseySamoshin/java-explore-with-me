@@ -9,14 +9,19 @@ import java.util.List;
 public interface RequestRepository extends JpaRepository<ParticipationRequest, Long> {
 
     @Query("select r from ParticipationRequest r " +
-            "where r.event.initiator = :userId")
+            "where r.requester = :userId " +
+            "and r.event.initiator.id <> :userId" )
     List<ParticipationRequest> findByUserId(Long userId);
 
     @Query("select r from ParticipationRequest r " +
-            "where r.event.id = :eventId")
+            "where r.event.initiator.id = :userId" )
+    List<ParticipationRequest> findByEventInitiatorId(Long userId);
+
+    @Query("select r from ParticipationRequest r " +
+            "where r.event.id = :eventId" )
     List<ParticipationRequest> findByEventId(Long eventId);
 
     @Query("select r from ParticipationRequest r " +
-            "where r.event.id in :eventIds")
+            "where r.event.id in :eventIds" )
     List<ParticipationRequest> findByEventIds(List<Long> eventIds);
 }

@@ -2,11 +2,8 @@ package ru.practicum.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
-import ru.practicum.Constants;
 import ru.practicum.model.ParticipationRequest;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +19,15 @@ public class EventRequestStatusUpdateResult {
     }
 
     public void addRequest(ParticipationRequest request) {
-        String created = request.getCreated().toString();//.format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT));
+        String created = request.getCreated().toString();
         Long event = request.getEvent().getId();
         Long id = request.getId();
         Long requester = request.getRequester();
         String status = request.getStatus();
         ParticipationRequestDto result = new ParticipationRequestDto(created, event, id, requester, status);
-        if(status.equals("CONFIRMED")) {
+        if (status.equals("CONFIRMED" )) {
             confirmedRequests.add(result);
-        } else if (status.equals("REJECTED")){
+        } else if (status.equals("REJECTED" )) {
             rejectedRequests.add(result);
         }
     }

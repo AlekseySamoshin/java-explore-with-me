@@ -3,13 +3,18 @@ package ru.practicum.dtoMapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
-import ru.practicum.dto.UpdateCompilationRequest;
 import ru.practicum.model.Compilation;
+import ru.practicum.model.Event;
+
+import java.util.List;
 
 @Component
 public class CompilationDtoMapper {
-    public Compilation mapNewCompilationDtoToCompilation(NewCompilationDto dto) {
+    EventDtoMapper eventDtoMapper = new EventDtoMapper();
+
+    public Compilation mapNewCompilationDtoToCompilation(NewCompilationDto dto, List<Event> events) {
         return Compilation.builder()
+                .events(events)
                 .title(dto.getTitle())
                 .pinned(dto.getPinned())
                 .build();
@@ -22,12 +27,4 @@ public class CompilationDtoMapper {
                 .title(compilation.getTitle())
                 .build();
     }
-
-//    public Compilation mapUpdateCompilationDtoToCompilation(Long compilationId, UpdateCompilationRequest compilationDto) {
-//        return Compilation.builder()
-//                .id(compilationId)
-//                .pinned(compilationDto.getPinned())
-//                .title(compilationDto.getTitle())
-//                .build();
-//    }
 }
