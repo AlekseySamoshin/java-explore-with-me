@@ -1,6 +1,7 @@
 package ru.practicum.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.PropertyValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -63,7 +64,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError PropertyValueException(final Exception e) {
+    public ApiError propertyValueException(final PropertyValueException e) {
         log.error("Ошибка: " + e.getMessage());
         return ApiError.builder()
                 .errors(Arrays.stream(e.getStackTrace())
