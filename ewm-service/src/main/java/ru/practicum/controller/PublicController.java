@@ -65,17 +65,17 @@ public class PublicController {
                                                     @RequestParam(required = false) String rangeStart,
                                                     @RequestParam(required = false) String rangeEnd,
                                                     @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
-                                                    @RequestParam(required = false) String sort,
+                                                    @RequestParam(required = false, defaultValue = "DESC") String sort,
                                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                     @Positive @RequestParam(defaultValue = "10") Integer size,
                                                     HttpServletRequest request) {
         log.info("Запрос: Получение событий с возможностью фильтрации");
-        return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRemoteAddr());
+        return eventService.getEventsWithFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
     @GetMapping("/events/{id}")
-    public EventFullDto getEventById(@PathVariable Long id) {
+    public EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) {
         log.info("Запрос: Получение подробной информации об опубликованном событии по его идентификатору");
-        return eventService.getEventDtoById(id);
+        return eventService.getEventDtoById(id, request);
     }
 }

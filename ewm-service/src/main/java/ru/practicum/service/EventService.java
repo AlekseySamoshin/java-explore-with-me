@@ -20,6 +20,7 @@ import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.LocationRepository;
 import ru.practicum.repository.RequestRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -230,7 +231,11 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    public EventFullDto getEventDtoById(Long eventId) {
+    public EventFullDto getEventDtoById(Long eventId, HttpServletRequest request) {
+        statsClient.saveHit(new EndpointHitDto("ewm-service",
+                request.getRequestURI(),
+                request.getRemoteAddr(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT))));
         Event event = getEventById(eventId);
         EventFullDto eventFullDto = eventDtoMapper.mapEventToFullDto(event);
         return getViewsCounter(eventFullDto);
@@ -427,7 +432,7 @@ public class EventService {
                                                     String sort,
                                                     Integer from,
                                                     Integer size,
-                                                    String ip) {
+                                                    HttpServletRequest request) {
         List<Event> events;
         LocalDateTime startDate;
         LocalDateTime endDate;
@@ -435,6 +440,9 @@ public class EventService {
             startDate = LocalDateTime.now();
         } else {
             startDate = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT));
+        }
+        if (text == null) {
+            text = "";
         }
         if (rangeEnd == null) {
             events = eventRepository.findEventsByText(text.toLowerCase(), PageRequest.of(from / size, size));
@@ -447,15 +455,12 @@ public class EventService {
         }
 
         events = events.stream()
-                .filter((event) -> event.getState().equals(EventState.PUBLISHED))
+                .filter((event) -> EventState.PUBLISHED.equals(event.getState()))
                 .collect(Collectors.toList());
-        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
-                .app("evm-service")
-                .uri("/events/")
-                .ip(ip)
-                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT)))
-                .build();
-        statsClient.saveHit(endpointHitDto);
+        statsClient.saveHit(new EndpointHitDto("ewm-service",
+                request.getRequestURI(),
+                request.getRemoteAddr(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT))));
         return createShortEventDtos(events);
     }
 
