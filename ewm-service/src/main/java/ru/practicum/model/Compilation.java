@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "compilations" )
+@Table(name = "compilations")
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +19,8 @@ public class Compilation {
 
     @ManyToMany
     @JoinTable(name = "events_to_compilations",
-            joinColumns = @JoinColumn(name = "event_id" ),
-            inverseJoinColumns = @JoinColumn(name = "compilation_id" ))
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "compilation_id"))
     private List<Event> events;
 
     private Boolean pinned;

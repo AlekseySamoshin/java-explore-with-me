@@ -35,12 +35,12 @@ public class UserService {
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("не удалось получить данные пользователя", "Пользователь id=" + userId + " не найден" ));
+                () -> new NotFoundException("не удалось получить данные пользователя", "Пользователь id=" + userId + " не найден"));
     }
 
     public UserDto addUser(NewUserRequest newUserDto) {
         if (userRepository.findByName(newUserDto.getName()).size() > 0) {
-            throw new ConflictException("не удалось создать пользователя", "имя (" + newUserDto.getName() + ") уже занято" );
+            throw new ConflictException("не удалось создать пользователя", "имя (" + newUserDto.getName() + ") уже занято");
         }
         User savedUser = userRepository.save(userDtoMapper.mapNewUserRequestToUser(newUserDto));
         log.info("Пользователь сохранен с id=" + savedUser.getId());
@@ -49,6 +49,6 @@ public class UserService {
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
-        log.info("Пользователь id=" + userId + " удален" );
+        log.info("Пользователь id=" + userId + " удален");
     }
 }

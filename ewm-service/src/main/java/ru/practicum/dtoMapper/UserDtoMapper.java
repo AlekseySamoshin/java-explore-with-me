@@ -13,7 +13,7 @@ public class UserDtoMapper {
                 user.getId(),
                 user.getEmail(),
                 user.getName()
-        );
+       );
     }
 
     public UserShortDto mapUserToShortDto(User user) {
@@ -31,7 +31,7 @@ public class UserDtoMapper {
                 userDto.getId(),
                 userDto.getEmail(),
                 userDto.getName()
-        );
+       );
     }
 
     public User mapNewUserRequestToUser(NewUserRequest newUser) {
@@ -39,6 +39,6 @@ public class UserDtoMapper {
                 null,
                 newUser.getEmail(),
                 newUser.getName()
-        );
+       );
     }
 }

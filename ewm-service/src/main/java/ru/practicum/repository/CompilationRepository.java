@@ -10,6 +10,6 @@ import java.util.List;
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
     @Query("select c from Compilation c " +
-            "where c.pinned = :pinned" )
+            "where c.pinned = :pinned")
     List<Compilation> findAll(Boolean pinned, Pageable page);
 }

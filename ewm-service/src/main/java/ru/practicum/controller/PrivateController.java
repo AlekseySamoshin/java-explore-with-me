@@ -10,7 +10,7 @@ import ru.practicum.service.EventService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users" )
+@RequestMapping("/users")
 @Slf4j
 public class PrivateController {
     EventService eventService;
@@ -20,15 +20,15 @@ public class PrivateController {
         this.eventService = eventService;
     }
 
-    @GetMapping("/{userId}/events" )
+    @GetMapping("/{userId}/events")
     public List<EventShortDto> getEventsByUser(@PathVariable Long userId,
-                                               @RequestParam(defaultValue = "0" ) Integer from,
-                                               @RequestParam(defaultValue = "10" ) Integer size) {
+                                               @RequestParam(defaultValue = "0") Integer from,
+                                               @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрос: Получение событий, добавленных пользователем id=" + userId);
         return eventService.getEventsByUser(userId, from, size);
     }
 
-    @PostMapping("/{userId}/events" )
+    @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto addNewEventByUser(@PathVariable Long userId,
                                           @RequestBody NewEventDto newEvent) {
@@ -36,14 +36,14 @@ public class PrivateController {
         return eventService.addEvent(userId, newEvent);
     }
 
-    @GetMapping("/{userId}/events/{eventId}" )
+    @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto getEventOfUserByIds(@PathVariable Long userId,
                                             @PathVariable Long eventId) {
         log.info("Запрос: Получение полной информации о событии id=" + eventId + ", пользователем id=" + userId);
         return eventService.getEventOfUserByIds(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}" )
+    @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEventOfUserByIds(@PathVariable Long userId,
                                                @PathVariable Long eventId,
                                                @RequestBody UpdateEventUserRequest request) {
@@ -51,14 +51,14 @@ public class PrivateController {
         return eventService.updateEventOfUserByIds(userId, eventId, request);
     }
 
-    @GetMapping("/{userId}/events/{eventId}/requests" )
+    @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getParticipationRequest(@PathVariable Long userId,
                                                                  @PathVariable Long eventId) {
         log.info("Запрос: Получение информации о запросах на участие в событии пользователя id=" + userId);
         return eventService.getParticipationRequestsDto(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/requests" )
+    @PatchMapping("/{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult updateParticipationRequest(@PathVariable Long userId,
                                                                      @PathVariable Long eventId,
                                                                      @RequestBody EventRequestStatusUpdateRequest request) {
@@ -66,13 +66,13 @@ public class PrivateController {
         return eventService.updateParticipationRequest(userId, eventId, request);
     }
 
-    @GetMapping("/{userId}/requests" )
+    @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getRequestsOfUser(@PathVariable Long userId) {
-        log.info("Запрос: Получение информации о заявках пользователя id=" + userId + " на участие в чужих событиях" );
+        log.info("Запрос: Получение информации о заявках пользователя id=" + userId + " на участие в чужих событиях");
         return eventService.getParticipationRequestsByUserId(userId);
     }
 
-    @PostMapping("/{userId}/requests" )
+    @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addParticipationRequest(@PathVariable Long userId,
                                                            @RequestParam Long eventId) {
@@ -80,7 +80,7 @@ public class PrivateController {
         return eventService.addParticipationRequest(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/requests/{requestId}/cancel" )
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelParticipationRequest(@PathVariable Long userId,
                                                               @PathVariable Long requestId) {
         log.info("Запрос: Отмена пользователем id=" + userId + " запроса на участие  id=" + requestId);

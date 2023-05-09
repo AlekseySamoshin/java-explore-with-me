@@ -69,7 +69,7 @@ public class ErrorHandler {
                 .errors(Arrays.stream(e.getStackTrace())
                         .map(Object::toString)
                         .collect(Collectors.toList()))
-                .message("ошибка валидации данных" )
+                .message("ошибка валидации данных")
                 .reason(e.getMessage())
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT)))

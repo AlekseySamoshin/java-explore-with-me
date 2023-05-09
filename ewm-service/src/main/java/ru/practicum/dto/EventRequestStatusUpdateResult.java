@@ -25,9 +25,9 @@ public class EventRequestStatusUpdateResult {
         Long requester = request.getRequester();
         String status = request.getStatus();
         ParticipationRequestDto result = new ParticipationRequestDto(created, event, id, requester, status);
-        if (status.equals("CONFIRMED" )) {
+        if (status.equals("CONFIRMED")) {
             confirmedRequests.add(result);
-        } else if (status.equals("REJECTED" )) {
+        } else if (status.equals("REJECTED")) {
             rejectedRequests.add(result);
         }
     }
