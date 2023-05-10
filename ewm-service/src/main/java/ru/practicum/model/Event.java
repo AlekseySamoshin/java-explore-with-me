@@ -17,54 +17,54 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(nullable = false, length = 2000)
-    String annotation;
+    private String annotation;
 
     @ManyToOne(optional = false)
     @JoinTable(name = "events_to_categories",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    Category category;
+    private Category category;
 
-    Long confirmedRequests;
+    private Long confirmedRequests;
 
     @Column(name = "created_on")
-    LocalDateTime createdOn;
+    private LocalDateTime createdOn;
 
     @Column(length = 7000)
-    String description;
+    private String description;
 
     @Column(nullable = false, name = "event_date")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
     @ManyToOne(optional = false)
-    User initiator;
+    private User initiator;
 
     @ManyToOne(optional = false)
-    Location location;
+    private Location location;
 
     @Column(nullable = false)
-    Boolean paid;
+    private Boolean paid;
 
     @Column(name = "participant_limit")
-    Integer participantLimit;
+    private Integer participantLimit;
 
     @Column(name = "published_on")
-    LocalDateTime publishedOn;
+    private LocalDateTime publishedOn;
 
     @Column(name = "request_moderation")
-    Boolean requestModeration;
+    private Boolean requestModeration;
 
-    EventState state;
+    private EventState state;
 
     @Column(nullable = false)
-    String title;
+    private String title;
 
     @ManyToMany
     @JoinTable(name = "events_to_compilations",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
-    List<Compilation> compilationList;
+    private List<Compilation> compilationList;
 }

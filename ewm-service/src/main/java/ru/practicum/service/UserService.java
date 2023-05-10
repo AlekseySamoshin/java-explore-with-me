@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class UserService {
-    UserRepository userRepository;
-    UserDtoMapper userDtoMapper;
+    private final UserRepository userRepository;
+    private final UserDtoMapper userDtoMapper;
 
     @Autowired
     public UserService(UserRepository userRepository, UserDtoMapper userDtoMapper) {

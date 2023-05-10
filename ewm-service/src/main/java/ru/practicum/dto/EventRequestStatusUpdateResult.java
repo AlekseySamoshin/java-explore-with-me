@@ -10,8 +10,8 @@ import java.util.List;
 @Getter
 @Setter
 public class EventRequestStatusUpdateResult {
-    List<ParticipationRequestDto> confirmedRequests;
-    List<ParticipationRequestDto> rejectedRequests;
+    private final List<ParticipationRequestDto> confirmedRequests;
+    private final List<ParticipationRequestDto> rejectedRequests;
 
     public EventRequestStatusUpdateResult() {
         confirmedRequests = new ArrayList<>();
@@ -25,9 +25,9 @@ public class EventRequestStatusUpdateResult {
         Long requester = request.getRequester();
         String status = request.getStatus();
         ParticipationRequestDto result = new ParticipationRequestDto(created, event, id, requester, status);
-        if (status.equals("CONFIRMED")) {
+        if ("CONFIRMED".equals(status)) {
             confirmedRequests.add(result);
-        } else if (status.equals("REJECTED")) {
+        } else if ("REJECTED".equals(status)) {
             rejectedRequests.add(result);
         }
     }

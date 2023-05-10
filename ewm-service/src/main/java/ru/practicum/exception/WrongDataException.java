@@ -1,7 +1,10 @@
 package ru.practicum.exception;
 
+import lombok.Getter;
+
+@Getter
 public class WrongDataException extends RuntimeException {
-    String reason;
+    private String reason;
 
     public WrongDataException(String message, String reason) {
         super(message);

@@ -10,9 +10,9 @@ import java.util.List;
 @Setter
 @Builder
 public class ApiError {
-    String message;
-    String reason;
-    String status;
-    String timestamp;
-    List<String> errors;
+    private String message;
+    private String reason;
+    private String status;
+    private String timestamp;
+    private List<String> errors;
 }

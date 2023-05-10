@@ -15,8 +15,8 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class EventDtoMapper {
     private final String dateTimeFormat = Constants.DATE_TIME_FORMAT;
-    CategoryDtoMapper categoryDtoMapper = new CategoryDtoMapper();
-    UserDtoMapper userDtoMapper = new UserDtoMapper();
+    private final CategoryDtoMapper categoryDtoMapper = new CategoryDtoMapper();
+    private final UserDtoMapper userDtoMapper = new UserDtoMapper();
 
     public EventFullDto mapEventToFullDto(Event event) {
         if (event.getState() == null) {

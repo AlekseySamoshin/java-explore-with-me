@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 public class CompilationDtoMapper {
-    EventDtoMapper eventDtoMapper = new EventDtoMapper();
+    private final EventDtoMapper eventDtoMapper = new EventDtoMapper();
 
     public Compilation mapNewCompilationDtoToCompilation(NewCompilationDto dto, List<Event> events) {
         return Compilation.builder()

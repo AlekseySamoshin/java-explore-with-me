@@ -22,8 +22,8 @@ import java.util.List;
 @Slf4j
 public class PublicController {
 
-    EventService eventService;
-    CompilationService compilationService;
+    private final EventService eventService;
+    private final CompilationService compilationService;
 
     @Autowired
     public PublicController(EventService eventService, CompilationService compilationService) {

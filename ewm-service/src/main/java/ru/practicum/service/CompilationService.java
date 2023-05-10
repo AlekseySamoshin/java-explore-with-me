@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @AllArgsConstructor
 public class CompilationService {
-    CompilationRepository compilationRepository;
-    CompilationDtoMapper compilationDtoMapper;
-    EventRepository eventRepository;
-    EventDtoMapper eventDtoMapper;
+    private final CompilationRepository compilationRepository;
+    private final CompilationDtoMapper compilationDtoMapper;
+    private final EventRepository eventRepository;
+    private final EventDtoMapper eventDtoMapper;
 
     public CompilationDto addCompilation(NewCompilationDto compilationDto) {
         List<Event> events = eventRepository.findEventsByIds(compilationDto.getEvents());

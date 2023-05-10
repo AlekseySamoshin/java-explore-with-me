@@ -26,7 +26,7 @@ public class ErrorHandler {
                         .map(Object::toString)
                         .collect(Collectors.toList()))
                 .message(e.getMessage())
-                .reason(e.reason)
+                .reason(e.getReason())
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT)))
                 .build();
@@ -41,7 +41,7 @@ public class ErrorHandler {
                         .map(Object::toString)
                         .collect(Collectors.toList()))
                 .message(e.getMessage())
-                .reason(e.reason)
+                .reason(e.getReason())
                 .status(HttpStatus.NOT_FOUND.toString())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT)))
                 .build();
@@ -56,7 +56,7 @@ public class ErrorHandler {
                         .map(Object::toString)
                         .collect(Collectors.toList()))
                 .message(e.getMessage())
-                .reason(e.reason)
+                .reason(e.getReason())
                 .status(HttpStatus.CONFLICT.toString())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT)))
                 .build();

@@ -15,7 +15,7 @@ import java.util.List;
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @ManyToMany
     @JoinTable(name = "events_to_compilations",
