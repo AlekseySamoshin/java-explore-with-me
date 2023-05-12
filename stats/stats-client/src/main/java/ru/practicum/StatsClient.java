@@ -1,6 +1,5 @@
 package ru.practicum;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -13,14 +12,9 @@ import java.util.List;
 @Service
 public class StatsClient {
     private static final String URL = "http://stats-server:9090";
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     private final WebClient webClient = WebClient.create(URL);
-
-    @Autowired
-    public StatsClient(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
         return webClient.post()
