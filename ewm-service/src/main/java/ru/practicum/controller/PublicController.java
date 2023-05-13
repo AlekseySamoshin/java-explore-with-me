@@ -1,15 +1,13 @@
 package ru.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.dto.CategoryDto;
-import ru.practicum.dto.CompilationDto;
-import ru.practicum.dto.EventFullDto;
-import ru.practicum.dto.EventShortDto;
+import ru.practicum.dto.*;
+import ru.practicum.service.CommentService;
 import ru.practicum.service.CompilationService;
 import ru.practicum.service.EventService;
 
@@ -20,16 +18,12 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class PublicController {
 
     private final EventService eventService;
     private final CompilationService compilationService;
-
-    @Autowired
-    public PublicController(EventService eventService, CompilationService compilationService) {
-        this.eventService = eventService;
-        this.compilationService = compilationService;
-    }
+    private final CommentService commentService;
 
     @GetMapping("/compilations")
     public List<CompilationDto> getCompilations(@RequestParam(defaultValue = "true") Boolean pinned,
@@ -77,5 +71,22 @@ public class PublicController {
     public EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) {
         log.info("Запрос: Получение подробной информации об опубликованном событии по его идентификатору");
         return eventService.getEventDtoById(id, request);
+    }
+
+    @GetMapping("/events/{eventId}/comments") //получение всех комментов к эвенту
+    public List<CommentDto> getCommentsByEvent(@PathVariable Long eventId,
+                                               @RequestParam(defaultValue = "0") Integer from,
+                                               @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Запрос: получение комментариев к событию id=" + eventId);
+        return commentService.getCommentsOfEvent(eventId, from, size);
+    }
+
+    @GetMapping("/events/{eventId}/comments") //получение всех комментов к эвенту
+    public List<CommentDto> findCommentsByText(@PathVariable Long eventId,
+                                               @RequestParam String text,
+                                               @RequestParam(defaultValue = "0") Integer from,
+                                               @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Запрос: получение комментариев к событию id=" + eventId);
+        return commentService.findCommentsByText(eventId, text, from, size);
     }
 }
