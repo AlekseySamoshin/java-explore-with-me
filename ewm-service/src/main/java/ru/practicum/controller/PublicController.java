@@ -74,19 +74,15 @@ public class PublicController {
     }
 
     @GetMapping("/events/{eventId}/comments") //получение всех комментов к эвенту
-    public List<CommentDto> getCommentsByEvent(@PathVariable Long eventId,
-                                               @RequestParam(defaultValue = "0") Integer from,
-                                               @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Запрос: получение комментариев к событию id=" + eventId);
-        return commentService.getCommentsOfEvent(eventId, from, size);
-    }
-
-    @GetMapping("/events/{eventId}/comments") //получение всех комментов к эвенту
     public List<CommentDto> findCommentsByText(@PathVariable Long eventId,
-                                               @RequestParam String text,
+                                               @RequestParam(required = false) String text,
                                                @RequestParam(defaultValue = "0") Integer from,
                                                @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Запрос: получение комментариев к событию id=" + eventId);
+        if (text == null) {
+            log.info("Запрос: получение комментариев к событию id=" + eventId);
+            return commentService.getCommentsOfEvent(eventId, from, size);
+        }
+        log.info("Запрос: поиск комментариев к событию id=" + eventId);
         return commentService.findCommentsByText(eventId, text, from, size);
     }
 }
