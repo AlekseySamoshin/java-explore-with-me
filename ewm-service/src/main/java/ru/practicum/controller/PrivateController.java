@@ -87,9 +87,9 @@ public class PrivateController {
 
     @PostMapping("/comments")
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto addNewComment (@PathVariable Long userId,
-                                     @RequestParam Long eventId,
-                                     @RequestBody CommentDto newCommentDto) {
+    public CommentDto addNewComment(@PathVariable Long userId,
+                                    @RequestParam Long eventId,
+                                    @RequestBody CommentDto newCommentDto) {
         log.info("Запрос: создание комментария пользователем id=" + userId + " к событию id=" + eventId);
         return commentService.addNewComment(userId, eventId, newCommentDto);
     }
