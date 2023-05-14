@@ -85,7 +85,7 @@ public class PrivateController {
         return eventService.cancelParticipationRequest(userId, requestId);
     }
 
-    @PostMapping("/comments") //добавление комментария пользователем
+    @PostMapping("/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto addNewComment (@PathVariable Long userId,
                                      @RequestParam Long eventId,

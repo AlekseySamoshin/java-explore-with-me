@@ -85,4 +85,10 @@ public class PublicController {
         log.info("Запрос: поиск комментариев к событию id=" + eventId);
         return commentService.findCommentsByText(eventId, text, from, size);
     }
+
+    @GetMapping("/comments/{commentId}") //получение всех комментов к эвенту
+    public CommentDto getCommentById(@PathVariable Long commentId) {
+        log.info("Запрос: получение комментария id=" + commentId);
+        return commentService.getCommentById(commentId);
+    }
 }

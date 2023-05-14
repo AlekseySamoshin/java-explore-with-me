@@ -76,12 +76,32 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NotFoundException("не удалось удалить комментарий", "комментарй id=" + commentId + " не найден")
         );
+        if (userId.equals(comment.getAuthor().getId())) {
+            commentRepository.deleteById(commentId);
+            log.info("комментарий id=" + commentId + " удален");
+        } else {
+            throw new WrongDataException("невозможно удалить комментарий id=" + commentId,
+                    "пользователь id=" + userId + " не является автором комментария");
+        }
+    }
+
+    public void deleteCommentByAdmin(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new NotFoundException("не удалось удалить комментарий", "комментарй id=" + commentId + " не найден")
+        );
         commentRepository.deleteById(commentId);
-        log.info("комментарий id=" + commentId + "удален");
+        log.info("комментарий id=" + commentId + " удален");
     }
 
     public List<CommentDto> findCommentsByText(Long eventId, String text, Integer from, Integer size) {
         return commentRepository.findByEventIdAndText(eventId, text.toLowerCase(), PageRequest.of(from / size, size));
+    }
+
+    public CommentDto getCommentById(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new NotFoundException("не удалось получить комментарий", "комментарий id=" + commentId + " не найден")
+        );
+        return commentDtoMapper.mapCommentToDto(comment);
     }
 
     private Comment getCommentFromDto(Long userId, Long eventId, CommentDto commentDto) {
