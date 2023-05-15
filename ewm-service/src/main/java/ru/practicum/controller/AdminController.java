@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
-import ru.practicum.service.CommentService;
-import ru.practicum.service.CompilationService;
-import ru.practicum.service.EventService;
-import ru.practicum.service.UserService;
+import ru.practicum.service.*;
 
 import java.util.List;
 
