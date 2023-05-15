@@ -17,27 +17,30 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class UserService {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserDtoMapper userDtoMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserDtoMapper userDtoMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.userDtoMapper = userDtoMapper;
     }
 
+    @Override
     public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
         return userRepository.findAllByIdsPageable(ids, PageRequest.of(from / size, size)).stream()
                 .map(user -> userDtoMapper.mapUserToDto(user))
                 .collect(Collectors.toList());
     }
 
+    @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("не удалось получить данные пользователя", "Пользователь id=" + userId + " не найден"));
     }
 
+    @Override
     public UserDto addUser(NewUserRequest newUserDto) {
         if (userRepository.findByName(newUserDto.getName()).size() > 0) {
             throw new ConflictException("не удалось создать пользователя", "имя (" + newUserDto.getName() + ") уже занято");
@@ -47,6 +50,7 @@ public class UserService {
         return userDtoMapper.mapUserToDto(savedUser);
     }
 
+    @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
         log.info("Пользователь id=" + userId + " удален");

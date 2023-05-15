@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CommentService implements CommentServiceInteface {
+public class CommentServiceImpl implements CommentService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
@@ -110,6 +110,21 @@ public class CommentService implements CommentServiceInteface {
                 () -> new NotFoundException("не удалось получить комментарий", "комментарий id=" + commentId + " не найден")
         );
         return commentDtoMapper.mapCommentToDto(comment);
+    }
+
+    private Comment getCommentFromDto(Long userId, Long eventId, CommentDto commentDto) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Не удалось добавить комментарий", "событие id=" + eventId + "не найдено")
+        );
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("Не удалось добавить комментарий", "пользователь id=" + eventId + "не найден")
+        );
+        return Comment.builder()
+                .text(commentDto.getText())
+                .author(user)
+                .event(event)
+                .created(LocalDateTime.now())
+                .build();
     }
 
 }

@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class EventService {
+public class EventServiceImpl implements EventService {
     private final CategoryDtoMapper categoryDtoMapper;
     private final EventDtoMapper eventDtoMapper;
     private final EventRepository eventRepository;
@@ -44,6 +44,7 @@ public class EventService {
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
 
+    @Override
     public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
         LocalDateTime rangeStartDateTime = null;
         LocalDateTime rangeEndDateTime = null;
@@ -66,6 +67,7 @@ public class EventService {
         return dtos;
     }
 
+    @Override
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminRequest updateRequest) {
         String errorMessage = "не удалось обновить событие id=" + eventId;
         Event event = eventRepository.findById(eventId).orElseThrow(
@@ -91,6 +93,7 @@ public class EventService {
         return getViewsCounter(eventFullDto);
     }
 
+    @Override
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         if (categoryRepository.findByName(newCategoryDto.getName()).size() > 0) {
             throw new ConflictException("не удалось создать категорию", "название (" + newCategoryDto.getName() + ") уже занято");
@@ -100,6 +103,7 @@ public class EventService {
         return categoryDtoMapper.mapCategoryToDto(category);
     }
 
+    @Override
     public void deleteCategoryById(Long catId) {
         if (categoryIsEmpty(catId)) {
             categoryRepository.deleteById(catId);
@@ -109,6 +113,7 @@ public class EventService {
         }
     }
 
+    @Override
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId).orElseThrow(
                 () -> new NotFoundException("не удалось обновить категорию", "Категория id=" + catId + " не найдена")
@@ -131,12 +136,14 @@ public class EventService {
         return eventsOfCategory.isEmpty();
     }
 
+    @Override
     public List<CategoryDto> getCategories(Integer from, Integer size) {
         return categoryRepository.findAll(PageRequest.of(from / size, size)).stream()
                 .map(categoryDtoMapper::mapCategoryToDto)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<EventShortDto> getEventsByUser(Long userId, Integer from, Integer size) {
         User user = userService.getUserById(userId);
         return eventRepository.findAllByUserId(user, PageRequest.of(from / size, size)).stream()
@@ -144,6 +151,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public EventFullDto addEvent(Long userId, NewEventDto newEvent) {
         User user = userService.getUserById(userId);
         Category category = categoryRepository.findById(newEvent.getCategory()).orElseThrow(
@@ -168,6 +176,7 @@ public class EventService {
         log.info("Сохранена локация id = " + event.getLocation().getId() + " для нового события");
     }
 
+    @Override
     public EventFullDto getEventOfUserByIds(Long userId, Long eventId) {
         User user = userService.getUserById(userId);
         Event event = getEventById(eventId);
@@ -178,6 +187,7 @@ public class EventService {
         return getViewsCounter(eventFullDto);
     }
 
+    @Override
     public EventFullDto updateEventOfUserByIds(Long userId, Long eventId, UpdateEventUserRequest request) {
         User user = userService.getUserById(userId);
         Event event = getEventById(eventId);
@@ -191,6 +201,7 @@ public class EventService {
         return getViewsCounter(eventFullDto);
     }
 
+    @Override
     public List<ParticipationRequestDto> getParticipationRequestsDto(Long userId, Long eventId) {
         List<ParticipationRequest> requests = getParticipationRequests(userId, eventId);
         return requests.stream()
@@ -198,6 +209,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public EventRequestStatusUpdateResult updateParticipationRequest(Long userId,
                                                                      Long eventId,
                                                                      EventRequestStatusUpdateRequest updateRequest) {
@@ -223,6 +235,7 @@ public class EventService {
         return result;
     }
 
+    @Override
     public List<ParticipationRequestDto> getParticipationRequestsByUserId(Long userId) {
         User user = userService.getUserById(userId);
 
@@ -231,6 +244,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public EventFullDto getEventDtoById(Long eventId, HttpServletRequest request) {
         statsClient.saveHit(new EndpointHitDto("ewm-service",
                 request.getRequestURI(),
@@ -374,6 +388,7 @@ public class EventService {
         return event;
     }
 
+    @Override
     public ParticipationRequestDto addParticipationRequest(Long userId, Long eventId) {
         User user = userService.getUserById(userId);
         Event event = getEventById(eventId);
@@ -404,6 +419,7 @@ public class EventService {
         return requestDtoMapper.mapRequestToDto(requestRepository.save(newRequest));
     }
 
+    @Override
     public ParticipationRequestDto cancelParticipationRequest(Long userId, Long requestId) {
         User user = userService.getUserById(userId);
         ParticipationRequest request = requestRepository.findById(requestId).orElseThrow(
@@ -417,12 +433,14 @@ public class EventService {
         return requestDtoMapper.mapRequestToDto(requestRepository.save(request));
     }
 
+    @Override
     public CategoryDto getCategoryById(Long catId) {
         Category category = categoryRepository.findById(catId).orElseThrow(
                 () -> new NotFoundException("не удалось получить категорию", "Категория id=" + catId + " не найдена"));
         return categoryDtoMapper.mapCategoryToDto(category);
     }
 
+    @Override
     public List<EventShortDto> getEventsWithFilters(String text,
                                                     List<Integer> categories,
                                                     Boolean paid,

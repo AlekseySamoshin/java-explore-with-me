@@ -22,12 +22,13 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class CompilationService {
+public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final CompilationDtoMapper compilationDtoMapper;
     private final EventRepository eventRepository;
     private final EventDtoMapper eventDtoMapper;
 
+    @Override
     public CompilationDto addCompilation(NewCompilationDto compilationDto) {
         List<Event> events = eventRepository.findEventsByIds(compilationDto.getEvents());
         Compilation compilation = compilationDtoMapper.mapNewCompilationDtoToCompilation(compilationDto, events);
@@ -38,6 +39,7 @@ public class CompilationService {
         return result;
     }
 
+    @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilationDto) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(
                 () -> new NotFoundException("не удалось обновить подборку", "Подборка id=" + compId + " не найдена"));
@@ -58,6 +60,7 @@ public class CompilationService {
         return result;
     }
 
+    @Override
     public void deleteCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(
                 () -> new NotFoundException("не удалось удалить подборку", "Подборка id=" + compId + " не найдена"));
@@ -65,6 +68,7 @@ public class CompilationService {
         log.info("Подборка id=" + compId + " удалена");
     }
 
+    @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         List<Compilation> compilations = compilationRepository.findAll(pinned, PageRequest.of(from / size, size));
         List<CompilationDto> compilationDtos = new ArrayList<>();
@@ -76,6 +80,7 @@ public class CompilationService {
         return compilationDtos;
     }
 
+    @Override
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(
                 () -> new NotFoundException("не удалось получить подборку", "Подборка id=" + compId + " не найдена")
