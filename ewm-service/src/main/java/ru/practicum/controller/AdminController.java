@@ -1,32 +1,23 @@
 package ru.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
-import ru.practicum.service.CompilationService;
-import ru.practicum.service.EventService;
-import ru.practicum.service.UserService;
+import ru.practicum.service.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/admin")
 @Slf4j
+@RequiredArgsConstructor
 public class AdminController {
     private final UserService userService;
     private final EventService eventService;
     private final CompilationService compilationService;
-
-    @Autowired
-    public AdminController(UserService userService,
-                           EventService eventService,
-                           CompilationService compilationService) {
-        this.userService = userService;
-        this.eventService = eventService;
-        this.compilationService = compilationService;
-    }
+    private final CommentService commentService;
 
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam List<Long> ids,
@@ -107,5 +98,11 @@ public class AdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable Long compId) {
         compilationService.deleteCompilationById(compId);
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable Long commentId) {
+        commentService.deleteCommentByAdmin(commentId);
     }
 }

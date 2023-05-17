@@ -1,10 +1,11 @@
 package ru.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
+import ru.practicum.service.CommentService;
 import ru.practicum.service.EventService;
 
 import java.util.List;
@@ -12,13 +13,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{userId}")
 @Slf4j
+@RequiredArgsConstructor
 public class PrivateController {
     private final EventService eventService;
-
-    @Autowired
-    public PrivateController(EventService eventService) {
-        this.eventService = eventService;
-    }
+    private final CommentService commentService;
 
     @GetMapping("/events")
     public List<EventShortDto> getEventsByUser(@PathVariable Long userId,
@@ -85,5 +83,39 @@ public class PrivateController {
                                                               @PathVariable Long requestId) {
         log.info("Запрос: Отмена пользователем id=" + userId + " запроса на участие  id=" + requestId);
         return eventService.cancelParticipationRequest(userId, requestId);
+    }
+
+    @PostMapping("/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addNewComment(@PathVariable Long userId,
+                                    @RequestParam Long eventId,
+                                    @RequestBody CommentDto newCommentDto) {
+        log.info("Запрос: создание комментария пользователем id=" + userId + " к событию id=" + eventId);
+        return commentService.addNewComment(userId, eventId, newCommentDto);
+    }
+
+    @GetMapping("/comments") // получение всех комментов юзера
+    public List<CommentDto> getCommentsByUser(@PathVariable Long userId,
+                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Запрос: получение комментариев пользователя id=" + userId);
+        return commentService.getCommentsOfUser(userId, from, size);
+    }
+
+    @PatchMapping("comments/{commentId}") // правки коммента автором
+    public CommentDto updateComment(@PathVariable Long userId,
+                                    @PathVariable Long commentId,
+                                    @RequestBody CommentDto updateCommentDto) {
+        log.info("Запрос: изменение комментария id=" + commentId + " пользователем id=" + userId);
+        return commentService.updateComment(userId, commentId, updateCommentDto);
+    }
+
+    @DeleteMapping("comments/{commentId}") // удаление коммента автором
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable Long userId,
+                              @PathVariable Long commentId) {
+        log.info("Запрос: удаление комментария id=" + commentId);
+        commentService.deleteComment(userId, commentId);
+        log.info("комментарий id=" + commentId + " удален");
     }
 }
