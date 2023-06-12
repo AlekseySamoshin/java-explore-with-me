@@ -14,7 +14,7 @@
 - Maven
 - Docker
 
-сборка проекта
+сборка проекта с помощью maven
 ```
 mvn package
 ```
